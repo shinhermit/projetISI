@@ -6,10 +6,13 @@ TriMesh::TriMesh(const string &name)
     : Object3D(name)
 {}
 
-void TriMesh::addVertex(my::Vertex v){
+void TriMesh::addVertex(my::Vertex v)
+{
   extendBoundingBox(v);
   _vertices.push_back(v);
 }
+
+
 void TriMesh::addVertex(double x, double y, double z){
   addVertex(my::Vertex(x,y,z));
 }
@@ -18,6 +21,7 @@ void TriMesh::addVertex(double x, double y, double z){
 void TriMesh::addTriangle(my::Triangle t){
   _triangles.push_back(t);
 }
+
 void TriMesh::addTriangle(int v1, int v2, int v3){
   my::Triangle t;
   t.push_back(v1);
@@ -25,6 +29,60 @@ void TriMesh::addTriangle(int v1, int v2, int v3){
   t.push_back(v3);
   addTriangle(t);
 }
+
+void TriMesh::_preSetColor(const int & indice, const int & maxIndice, const Color & color, const string & methodName, const std::string & range) throw(std::invalid_argument)
+{
+    std::ostringstream oss;
+    bool invalid = false;
+
+    if(! (0 <= indice && indice < maxIndice)){
+        oss << "TriMesh::_preSetColor (for " << methodName << "): given indice is out of range " << range << std::endl
+            << "\t given indice is " << indice << std::endl
+            << "\t sizeV() is " << maxIndice << std::endl;
+        invalid = true;
+    }
+
+    if(! (0 <= color[0] && color[0] <= 1
+          &&
+          0 <= color[1] && color[1] <= 1
+          &&
+          0 <= color[2] && color[2] <= 1
+          &&
+          0 <= color[3] && color[3] <= 1)){
+        oss << "TriMesh::_preSetColor (for " << methodName << "): given color is not a valid color. RGBA Color components are float in range [0,1]" << std::endl
+            << "\t given color is R=" << color[0] << " G=" << color[1] << " B=" << color[2] << " A=" << color[3] << std::endl;
+        invalid = true;
+    }
+
+    if(invalid)
+        throw std::invalid_argument(oss.str());
+}
+
+void TriMesh::setVertexColor(const int & vertex, const my::Color & color)
+{
+    _preSetColor(vertex, sizeV(), color, "setVertexColor", "[0,sizeV()]");
+    _colors[vertex] = color;
+}
+
+void TriMesh::setVertexColor(const int & vertex, const float & R, const float & G, const float & B, const float & A)
+{
+    setVertexColor(vertex, my::Color(R,G,B,A));
+}
+
+void TriMesh::setTriangleColor(const int & t, const my::Color & color)
+{
+    _preSetColor(t, sizeT(), color, "setTriangleColor", "[0,sizeT()]");
+    for(int i=0; i < _triangles[t].size(); ++i){
+        const int & vertex = _triangles[t][i];
+        _colors[vertex] = color;
+    }
+}
+
+void TriMesh::setTriangleColor(const int & t, const float & R, const float & G, const float & B, const float & A)
+{
+    setTriangleColor(t, my::Color(R,G,B,A));
+}
+
 void TriMesh::addNormalT(my::Normal n){
   _normalsT.push_back(n);
 }
@@ -69,6 +127,12 @@ void TriMesh::includeMesh(const TriMesh & mesh)
     {
         _normalsV.push_back(*it);
     }
+}
+
+void TriMesh::loadOffFile(const string & filename, my::IPolygonTriangulator * triangulator)
+{
+    my::OffLoader off(*this, filename, triangulator);
+    off.load();
 }
 
 void TriMesh::_preCollapseVertices(const int &slave, const int &master) throw(std::invalid_argument)
@@ -264,8 +328,9 @@ int TriMesh::sizeT() const
 }
 
 
-my::Vertex TriMesh::getVertex(int i){
-  return _vertices[i];
+my::Vertex TriMesh::getVertex(const int & i)const
+{
+  return _vertices.at(i);
 }
 
 
@@ -392,6 +457,7 @@ void TriMesh::draw(bool flipnormals){
   unsigned int i,t;
   bool smooth;
   my::Normal n;
+  std::map<int,my::Color>::iterator it;
 
   GLint mode[1];
   glGetIntegerv(GL_SHADE_MODEL, mode);
@@ -406,7 +472,11 @@ void TriMesh::draw(bool flipnormals){
         for(i=0; i<3; i++){
             n=_normalsV[3*t+i];
             if(flipnormals) n*=-1;
-            //        glNormal3fv(&n[0]);
+
+            it = _colors.find(_triangles[t][i]);
+            if(it != _colors.end())
+                glColor4f(it->second[0], it->second[1], it->second[2], it->second[3]);
+
             glNormal3fv(glm::value_ptr(n));
             glVertex3fv(glm::value_ptr(_vertices[_triangles[t][i]]));
           }
@@ -417,8 +487,13 @@ void TriMesh::draw(bool flipnormals){
           n=_normalsT[t];
           if(flipnormals) n*=-1;
           glNormal3fv(glm::value_ptr(n));
-          for(i=0; i<3; i++)
-            glVertex3fv(glm::value_ptr(_vertices[_triangles[t][i]]));
+          for(i=0; i<3; i++){
+              it = _colors.find(_triangles[t][i]);
+              if(it != _colors.end())
+                  glColor4f(it->second[0], it->second[1], it->second[2], it->second[3]);
+
+              glVertex3fv(glm::value_ptr(_vertices[_triangles[t][i]]));
+          }
         }
       glEnd();
     }

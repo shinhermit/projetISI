@@ -19,26 +19,33 @@
 #include <assert.h>
 
 #include "my_object3d.h"
+#include "iMesh.h"
 #include "my_types.h"
 #include "parametrics/parametric.h"
 #include "functionals/functional.h"
 #include "utils/convert.h"
 #include "utils/constant.h"
+#include "utils/off_loader.h"
+#include "utils/ipolygontriangulator.h"
 
 
 
 using namespace std;
 /** 
  * Simple Triangular Mesh Object
+ * Imesh is an interface (thus with no attributes), so multiple inheritance is not problematic.
+ * IMesh is introduced to enable construction of components which work on Meshes (so TriMesh can instanciate such component and pass it it's own reference)
  *
  */
-class TriMesh : public Object3D {
+class TriMesh : public Object3D, my::IMesh
+{
 
 protected:
   std::vector<my::Vertex>   _vertices;
   std::vector<my::Triangle> _triangles;
   std::vector<my::Normal>   _normalsT;
   std::vector<my::Normal>   _normalsV;
+  std::map<int, my::Color> _colors;
 
 public:
   TriMesh(const std::string & name="Trimesh");
@@ -67,6 +74,7 @@ public:
    */
   void addVertex(my::Vertex v);
 
+
   /**
    * adds a vertex to the mesh
    * @param x the x coordinate of the vertex to be added
@@ -74,7 +82,6 @@ public:
    * @param z the z coordinate of the vertex to be added
    */
   void addVertex(double x, double y, double z);
-
 
   /**
    * adds a triangle to the mesh
@@ -90,6 +97,39 @@ public:
    */
   void addTriangle(int v1, int v2, int v3);
 
+  void _preSetColor(const int & indice, const int & maxIndice, const my::Color & color, const std::string & methodName, const std::string & maxIndiceName="") throw(std::invalid_argument);
+
+  /**
+ * Set the color of the vertex indiced by the given argument
+ * @param vertex indice of the vertex that is to be colored
+ * @param col RGBA color of the vertice
+ * @example setColor(0, my::Color(0.3,0.4,0.1,1);
+ */
+  void setVertexColor(const int & vertex, const my::Color & color);
+
+  /**
+ * Set the color of the vertex indiced by the given argument
+ * @param vertex indice of the vertex that is to be colored
+ * @param col RGBA color of the vertice
+ * @example setColor(0, my::Color(0.3,0.4,0.1,1);
+ */
+  void setVertexColor(const int & vertex, const float & R, const float & G, const float & B, const float & A);
+
+  /**
+ * Set the color of the vertices of the tirnagle indiced by the given argument
+ * @param triangle indice of the triangle that is to be colored
+ * @param col RGBA color of the vertice
+ * @example setColor(0, my::Color(0.3,0.4,0.1,1);
+ */
+  void setTriangleColor(const int & t, const my::Color & color);
+
+  /**
+ * Set the color of the vertices of the tirnagle indiced by the given argument
+ * @param triangle indice of the triangle that is to be colored
+ * @param col RGBA color of the vertice
+ * @example setColor(0, my::Color(0.3,0.4,0.1,1);
+ */
+  void setTriangleColor(const int & t, const float & R, const float & G, const float & B, const float & A);
 
   /**
    * adds a triangle normal to the mesh
@@ -108,6 +148,12 @@ public:
    * @param mesh the mesh we want to include
    */
   void includeMesh(const TriMesh & mesh);
+
+  /**
+   * loads a mesh from an OFF file.
+   * @param filename name of the OFF file which contains the data.
+   */
+  void loadOffFile(const std::string & filename, my::IPolygonTriangulator * triangulator=0);
 
   void _preCollapseVertices(const int & slave, const int & master) throw(std::invalid_argument);
 
@@ -153,7 +199,7 @@ public:
    * gets a vertex
    * @param index the index of the vertex
    */
-  my::Vertex getVertex(int index);
+  my::Vertex getVertex(const int & index)const;
 
   virtual std::string toString();
   virtual void toOStream(std::ostream& out=std::cout) const;
@@ -182,8 +228,6 @@ public:
    * @return the scaling factor
    */
   double normalize();
-
-
 };
 
 
