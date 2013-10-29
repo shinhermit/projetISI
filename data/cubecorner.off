@@ -1,0 +1,32 @@
+OFF
+10 7 0
+# the corner vertices
+0 1 1
+1 0 1
+1 1 0
+#front vertices
+-1 1 1
+-1 -1 1
+1 -1 1
+#back vertices
+1 1 -1
+1 -1 -1
+-1 -1 -1
+-1 1 -1
+
+### polygons
+#corner
+3 0 1 2
+#front
+5 3 4 5 1 0
+#back
+4 9 6 7 8
+#bottom
+4 4 8 7 5
+#top
+5 3 0 2 6 9
+#left
+4 3 9 8 4
+#right
+5 1 5 7 6 2
+
