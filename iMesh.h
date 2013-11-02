@@ -135,6 +135,7 @@ public:
    */
     virtual my::Vertex getVertex(const int & index)const=0;
 
+
     /**
    * updates the bouding box of the object
    */

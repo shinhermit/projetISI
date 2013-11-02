@@ -56,43 +56,72 @@ std::basic_istream<char> & my::OffLoader::_getDataLine(std::fstream & file, std:
     return file;
 }
 
-void my::OffLoader::_getMesh(std::fstream & file) throw(std::runtime_error, std::range_error)
+void my::OffLoader::_getSizes(fstream & file, int & vertex_count, int & face_count, int &edge_count) throw(std::runtime_error)
+{
+    std::ostringstream oss;
+    std::istringstream iss;
+    std::string line;
+    bool invalid;
+
+    _getDataLine(file, line);
+    iss.str(line);
+
+    invalid = false;
+    if(iss >> vertex_count)
+        if(iss >> face_count)
+            if(iss >> edge_count);
+            else invalid = true;
+        else invalid = true;
+    else invalid = true;
+
+    if(invalid)
+    {
+        oss << "OffLoader::_getSizes: sizes data line is invalid" << std::endl
+            << "\t in file " << _filename << std::endl
+            << "\t at line " << _lineNum << std::endl;
+        throw std::runtime_error(oss.str());
+    }
+
+}
+
+bool my::OffLoader::_getColor(std::istringstream & iss, float & R, float & G, float & B, float & A)
+{
+    bool colored;
+
+    colored = false;
+    if(iss >> R)
+        if(iss >> G)
+            if(iss >> B)
+                colored = true;
+    if(! (iss >> A))
+        A = 1.;
+
+    return colored;
+}
+
+void my::OffLoader::_postGetElement(const int & actual, const int & specified, const std::string & elementName, const std::string & methodName) throw(std::runtime_error)
+{
+    std::ostringstream oss;
+
+    if(actual != specified){
+        oss << "OffLoader::_postGetElement (for " << methodName << "): number of " << elementName << " is different from specified number" << std::endl
+            << "\t in file " << _filename << std::endl
+            << "\t at line " << _lineNum << std::endl
+            << "\t specified number is " << specified << std::endl
+            << "\t actual number is " << actual << std::endl;
+        throw std::runtime_error(oss.str());
+    }
+}
+
+void my::OffLoader::_getVertices(fstream & file, const int & vertex_count) throw(std::runtime_error)
 {
     std::ostringstream oss;
     std::string line;
-    int vertex_count, face_count, edge_count;
-    int polygonSize;
     float x,y,z;
     float R,G,B,A;
-    my::Color col;
-    bool colored, invalid;
-    int i, j;
-    int vertex;
-    my::MeshRefPolygon poly(_mesh);
+    bool invalid;
+    int i;
 
-    _getDataLine(file, line);
-
-    {//temporary memory
-        std::istringstream iss(line);
-        invalid = false;
-        if(iss >> vertex_count)
-            if(iss >> face_count)
-                if(iss >> edge_count);
-                else invalid = true;
-            else invalid = true;
-        else invalid = true;
-
-        if(invalid)
-        {
-            oss << "OffLoader::_getMesh: first data line is invalid" << std::endl
-                << "\t in file " << _filename << std::endl
-                << "\t at line " << _lineNum << std::endl;
-            throw std::runtime_error(oss.str());
-        }
-
-    }
-
-    //vertices
     i = 0;
     while(i < vertex_count && _getDataLine(file, line)){
         std::istringstream iss(line);
@@ -115,30 +144,25 @@ void my::OffLoader::_getMesh(std::fstream & file) throw(std::runtime_error, std:
 
         _mesh.addVertex(x,y,z);
 
-        //Color
-        colored = false;
-        if(iss >> R)
-            if(iss >> G)
-                if(iss >> B)
-                    colored = true;
-        if(! (iss >> A))
-            A = 1.;
-
-        if(colored)
+        if(_getColor(iss, R,G,G,A))
             _mesh.setVertexColor(_mesh.sizeV()-1, R,G,B,A);
 
         ++i;
     }
 
-    if(i < vertex_count){
-        oss << "OffLoader::_getMesh: number of vertices is different from specified number" << std::endl
-            << "\t in file " << _filename << std::endl
-            << "\t specified number is " << vertex_count << std::endl
-            << "\t actual number is " << i << std::endl;
-        throw std::runtime_error(oss.str());
-    }
+    _postGetElement(i, vertex_count, "vertices", "_getVertices");
+}
 
-    //polygons
+void my::OffLoader::_getPolygons(fstream & file, const int & face_count) throw(std::runtime_error, std::out_of_range)
+{
+    std::ostringstream oss;
+    std::string line;
+    int polygonSize;
+    float R,G,B,A;
+    int i, j;
+    int vertex;
+    my::MeshRefPolygon poly(_mesh);
+
     i=0;
     while(i < face_count && _getDataLine(file, line)){
         std::istringstream iss(line);
@@ -150,7 +174,6 @@ void my::OffLoader::_getMesh(std::fstream & file) throw(std::runtime_error, std:
             throw std::runtime_error(oss.str());
         }
 
-        //vertices
         j = 0;
         poly.clear();
         while( (iss >> vertex) && (j < polygonSize) ){
@@ -160,34 +183,18 @@ void my::OffLoader::_getMesh(std::fstream & file) throw(std::runtime_error, std:
                     << "\t encountered indice is " << vertex << std::endl
                     << "\t in file " << _filename << std::endl
                     << "\t at line " << _lineNum << std::endl;
-                throw std::range_error(oss.str());
+                throw std::out_of_range(oss.str());
             }
 
             poly.addRef(vertex);
             ++j;
         }
 
-        if(j < polygonSize){
-            oss << "OffLoader::_getMesh: actual number of vertices is different from specified face vertices number" << std::endl
-                << "\t in file " << _filename << std::endl
-                << "\t at line " << _lineNum << std::endl
-                << "\t specified number is " << polygonSize << std::endl
-                << "\t actual number is " << j << std::endl;
-            throw std::runtime_error(oss.str());
-        }
+        _postGetElement(j, polygonSize, "vertices in polygon", "_getPolygons");
 
         _addTriangles(poly);
 
-        //Color
-        colored = false;
-        if(iss >> R)
-            if(iss >> G)
-                if(iss >> B)
-                    colored = true;
-        if(! (iss >> A))
-            A = 1.;
-
-        if(colored){
+        if(_getColor(iss, R,G,B,A)){
             for(int i=0; i < poly.size(); ++i){
                 _mesh.setVertexColor(poly.vertexRef(i), R,G,B,A);
             }
@@ -196,14 +203,18 @@ void my::OffLoader::_getMesh(std::fstream & file) throw(std::runtime_error, std:
         ++i;
     }
 
-    if(i < face_count){
-        oss << "OffLoader::_getMesh: number of polygons is different from specified number" << std::endl
-            << "\t in file " << _filename << std::endl
-            << "\t specified number is " << face_count << std::endl
-            << "\t actual number is " << i << std::endl;
-        throw std::runtime_error(oss.str());
-    }
+    _postGetElement(i, face_count, "polygons", "_getPolygons");
+}
 
+void my::OffLoader::_getMesh(std::fstream & file) throw(std::runtime_error, std::range_error)
+{
+    int vertex_count, face_count, edge_count;
+
+    _getSizes(file, vertex_count, face_count, edge_count);
+
+    _getVertices(file, vertex_count);
+
+    _getPolygons(file, face_count);
 }
 
 my::OffLoader::OffLoader(my::IMesh & receptacle, const std::string & filename, my::IPolygonTriangulator * triangulator) throw(std::invalid_argument)

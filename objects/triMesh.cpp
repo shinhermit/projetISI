@@ -330,7 +330,7 @@ int TriMesh::sizeT() const
 
 my::Vertex TriMesh::getVertex(const int & i)const
 {
-  return _vertices.at(i);
+    return _vertices.at(i);
 }
 
 

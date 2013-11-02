@@ -40,6 +40,11 @@ private:
       */
     std::basic_istream<char> & _getDataLine(std::fstream & file, std::string & line);
 
+    void _getSizes(std::fstream & file, int & vertex_count, int & face_count, int & edge_count) throw(std::runtime_error);
+    bool _getColor(std::istringstream & iss, float & R, float & G, float & B, float & A);
+    void _postGetElement(const int & actual, const int & specified, const std::string & elementName, const std::string & methodName) throw(std::runtime_error);
+    void _getVertices(std::fstream & file, const int & vertex_count) throw(std::runtime_error);
+    void _getPolygons(std::fstream & file, const int & face_count) throw(std::runtime_error, std::out_of_range);
     void _getMesh(std::fstream & file) throw(std::runtime_error, std::range_error);
     void _addTriangles(my::MeshRefPolygon & polygon);
 public:
