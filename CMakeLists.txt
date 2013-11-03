@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-project(M1_ISI_isiviewer-1.3)
+project(M1_ISI_isiproject)
 
 find_package(Qt4)
 set(QT_USE_QTXML 1)
@@ -30,12 +30,12 @@ set(SOURCES ${UIC_OUT} ${MOC_OUT}
             utils/constant.cpp utils/off_loader.cpp utils/planarexpression utils/geometry
             utils/abstractpolygon.cpp utils/meshrefpolygon.cpp utils/earclipping.cpp)
 
-add_executable(isiviewer ${SOURCES})
+add_executable(isiproject ${SOURCES})
 
-target_link_libraries (isiviewer GLEW ${QT_LIBRARIES} QGLViewer) 
+target_link_libraries (isiproject GLEW ${QT_LIBRARIES} QGLViewer) 
 
 # add a symbolic link toward the source directory
-add_custom_command(TARGET isiviewer POST_BUILD
+add_custom_command(TARGET isiproject POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_SOURCE_DIR}/data ${CMAKE_CURRENT_BINARY_DIR}/data
   )
 

@@ -83,6 +83,8 @@ void my::FuncSurface::_fitMesh()
     for(int i=0; i< _vertices.size(); ++i){
         _vertices[i] = (_vertices[i]+translate)*scale;
     }
+
+    computeBoundingBox();
 }
 
 my::FuncSurface::FuncSurface(int nbx, int nby,

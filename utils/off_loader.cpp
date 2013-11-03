@@ -56,6 +56,46 @@ std::basic_istream<char> & my::OffLoader::_getDataLine(std::fstream & file, std:
     return file;
 }
 
+void my::OffLoader::_postGetElement(const int & actual, const int & specified, const std::string & elementName, const std::string & methodName) throw(std::runtime_error)
+{
+    std::ostringstream oss;
+
+    if(actual != specified){
+        oss << "OffLoader::_postGetElement (for " << methodName << "): number of " << elementName << " is different from specified number" << std::endl
+            << "\t in file " << _filename << std::endl
+            << "\t at line " << _lineNum << std::endl
+            << "\t specified number is " << specified << std::endl
+            << "\t actual number is " << actual << std::endl;
+        throw std::runtime_error(oss.str());
+    }
+}
+
+void my::OffLoader::_exceptInvalidDataFormat(const std::string & line, const std::string & element, const std::string & methodName, const std::string & moreInfo)throw(std::runtime_error)
+{
+    std::ostringstream oss;
+
+    oss << "OffLoader::_exceptInvalidDataFormat (for " << methodName << "): invalid " << element << " informations" << std::endl
+        << "\t in file " << _filename << std::endl
+        << "\t at line " << _lineNum << std::endl
+        << "\t last read line: [[" << line << "]]" << std::endl
+        << "\t " << moreInfo << std::endl;
+
+    throw std::runtime_error(oss.str());
+}
+
+void my::OffLoader::_exceptInvalidValue(const std::string & methodName, const std::string & element, const std::string & valueType, const float & value, const float & rangeMin, const float & rangeMax, const std::string & moreInfo) throw(std::out_of_range)
+{
+    std::ostringstream oss;
+
+    oss << "OffLoader::_exceptInvalidValue (for " << methodName << "): invalid " << valueType << " for " << element << std::endl
+        << "\t range is [" << rangeMin << ", " << rangeMax << "]" << std::endl
+        << "\t encountered indice is " << value << std::endl
+        << "\t in file " << _filename << std::endl
+        << "\t at line " << _lineNum << std::endl
+        << "\t " << moreInfo << std::endl;
+    throw std::out_of_range(oss.str());
+}
+
 void my::OffLoader::_getSizes(fstream & file, int & vertex_count, int & face_count, int &edge_count) throw(std::runtime_error)
 {
     std::ostringstream oss;
@@ -99,23 +139,8 @@ bool my::OffLoader::_getColor(std::istringstream & iss, float & R, float & G, fl
     return colored;
 }
 
-void my::OffLoader::_postGetElement(const int & actual, const int & specified, const std::string & elementName, const std::string & methodName) throw(std::runtime_error)
-{
-    std::ostringstream oss;
-
-    if(actual != specified){
-        oss << "OffLoader::_postGetElement (for " << methodName << "): number of " << elementName << " is different from specified number" << std::endl
-            << "\t in file " << _filename << std::endl
-            << "\t at line " << _lineNum << std::endl
-            << "\t specified number is " << specified << std::endl
-            << "\t actual number is " << actual << std::endl;
-        throw std::runtime_error(oss.str());
-    }
-}
-
 void my::OffLoader::_getVertices(fstream & file, const int & vertex_count) throw(std::runtime_error)
 {
-    std::ostringstream oss;
     std::string line;
     float x,y,z;
     float R,G,B,A;
@@ -134,13 +159,8 @@ void my::OffLoader::_getVertices(fstream & file, const int & vertex_count) throw
             else invalid = true;
         else invalid = true;
 
-        if(invalid){
-            oss << "OffLoader::_getMesh: invalid vertex informations" << std::endl
-                << "\t in file " << _filename << std::endl
-                << "\t at line " << _lineNum << std::endl
-                << "\t last read line: [[" << line << "]]" << std::endl;
-            throw std::runtime_error(oss.str());
-        }
+        if(invalid)
+            _exceptInvalidDataFormat(line, "vertex", "_getVertices", "");
 
         _mesh.addVertex(x,y,z);
 
@@ -155,7 +175,6 @@ void my::OffLoader::_getVertices(fstream & file, const int & vertex_count) throw
 
 void my::OffLoader::_getPolygons(fstream & file, const int & face_count) throw(std::runtime_error, std::out_of_range)
 {
-    std::ostringstream oss;
     std::string line;
     int polygonSize;
     float R,G,B,A;
@@ -167,24 +186,14 @@ void my::OffLoader::_getPolygons(fstream & file, const int & face_count) throw(s
     while(i < face_count && _getDataLine(file, line)){
         std::istringstream iss(line);
 
-        if(! (iss >> polygonSize) ){
-            oss << "OffLoader::_getMesh: invalid face specification encountered. Number of vertices invalid" << std::endl
-                << "\t in file " << _filename << std::endl
-                << "\t at line " << _lineNum << std::endl;
-            throw std::runtime_error(oss.str());
-        }
+        if(! (iss >> polygonSize) )
+            _exceptInvalidDataFormat(line, "polygon", "_getPolygons", "Number of vertices invalid");
 
         j = 0;
         poly.clear();
         while( (iss >> vertex) && (j < polygonSize) ){
-            if(! (0 <= vertex && vertex < _mesh.sizeV()) ){
-                oss << "OffLoader::_getMesh: encounter polygon with vertex indice out or range" << std::endl
-                    << "\t range is [0," << _mesh.sizeV() << "]" << std::endl
-                    << "\t encountered indice is " << vertex << std::endl
-                    << "\t in file " << _filename << std::endl
-                    << "\t at line " << _lineNum << std::endl;
-                throw std::out_of_range(oss.str());
-            }
+            if(! (0 <= vertex && vertex < _mesh.sizeV()) )
+                _exceptInvalidValue("_getPolygons", "polygon", "number of vertices", vertex, 0, _mesh.sizeV(), "vertex indice out of range");
 
             poly.addRef(vertex);
             ++j;
@@ -257,11 +266,11 @@ void my::OffLoader::load()
         }
     }
 
-    //Comments and blank lines
     _getMesh(file);
 
     file.close();
 
+    _mesh.normalize();
     _mesh.computeNormalsT();
     _mesh.computeNormalsV();
 }

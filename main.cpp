@@ -68,14 +68,14 @@ int main(int argc, char *argv[]){
   myScene->addObject(new Pyramid());
 
   // add surface functions
-//  try{
-//      myScene->addObject(new my::FuncSurface(50,50, -3.14, 3.14, -3.14, 3.14, my::FuncSinCos()));
-//      myScene->addObject(new my::FuncSurface(50,50, -3.14, 3.14, -3.14, 3.14));
-//  }
-//  catch(const std::invalid_argument & e){
-//      QPointer<QMessageBox> msgbox = new QMessageBox(QMessageBox::Critical, "Exception caught", e.what(), QMessageBox::Ok);
-//      msgbox->show();
-//  }
+  try{
+      myScene->addObject(new my::FuncSurface(50,50, -3.14, 3.14, -3.14, 3.14, my::FuncSinCos()));
+      myScene->addObject(new my::FuncSurface(50,50, -3.14, 3.14, -3.14, 3.14));
+  }
+  catch(const std::invalid_argument & e){
+      QPointer<QMessageBox> msgbox = new QMessageBox(QMessageBox::Critical, "Exception caught", e.what(), QMessageBox::Ok);
+      msgbox->show();
+  }
 
   // add user defined OFF files
   try{
