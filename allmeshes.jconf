@@ -1,0 +1,16 @@
+--cone --cone-height 1. --cone-aperture 26.5 --cone-slices 10 --cone-stacks 5 --cone-basediv 1
+--cylinder --cylinder-height 2. --cylinder-radius 1 --cylinder-slices 10 --cylinder-stacks 5 --cylinder-basediv 1
+--disk --disk-radius 1. --disk-slices 10 --disk-circ-div 1 --disk-center-x 0 --disk-center-y 0 --disk-center-z 0
+--diskhole --diskh-small-radius .3 --diskh-big-radius 1. --diskh-slices 10 --diskh-circ-div 1 --diskh-center-x 0 --diskh-center-y 0 --diskh-center-z 0
+--funcsurface --func expcos --func-sample-x 50 --func-sample-y 50 --func-min-x -3.14 --func-max-x 3.14 --func-min-y -3.14 --func-max-y 3.14
+--funcsurface --func sincos --func-sample-x 50 --func-sample-y 50 --func-min-x -3.14 --func-max-x 3.14 --func-min-y -3.14 --func-max-y 3.14
+--sphere --sphere-radius 1. --sphere-slices 2 --sphere-stacks 2
+--torus --torus-path-radius 0.6 --torus-tube-radius 0.4 --torus-slices 20 --torus-stacks 5
+--cubecorner --cubecorner-spread 0.5
+--off Venus
+--off Tref
+--off Abstr
+--off Hdodec
+--no-cube
+--no-pyramid
+
