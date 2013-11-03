@@ -18,7 +18,7 @@ class Pyramid : public TriMesh {
 
 public:
   Pyramid();
-  virtual ~Pyramid(){};
+  virtual ~Pyramid(){}
 
 
 };
