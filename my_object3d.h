@@ -50,8 +50,8 @@ public:
   /**
    * Set and get the name of the object
    */
-  std::string getName() {return _name;}
-  void setName(std::string name){_name = name;}
+  std::string getName();
+  void setName(std::string name);
 
   /**
    * Draw the object

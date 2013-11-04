@@ -371,6 +371,75 @@ void TriMesh::computeNormalsT(){
     assert(_normalsT.size() == _triangles.size());
 }
 
+void TriMesh::_computeNormalsV_naive(float angle_threshold)
+{
+    my::Normal n, m, sum;
+    unsigned int i, j, k, l;
+    unsigned int refVertex, testVertex;
+
+    for(i=0; i < _triangles.size(); ++i){
+        n = _normalsT[i];
+        for(j=0; j < _triangles[i].size(); ++j){
+            sum = n;
+            refVertex = _triangles[i][j];
+
+            for(k=0; k < _triangles.size(); ++k){
+                m = _normalsT[k];
+                if(i != k && glm::angle(n, m) < angle_threshold){
+                    for(l=0; l < _triangles[k].size(); ++l){
+                        testVertex = _triangles[k][l];
+                        if(refVertex == testVertex){
+                            sum += m;
+                        }
+                    }
+                }
+            }
+            addNormalV(glm::normalize(sum));
+        }
+    }
+}
+
+void TriMesh::_computeNormalsV_adjacence(float angle_threshold)
+{
+    // the algorithm below favors speed rather than memory
+
+    my::Normal n,m, sum;
+    std::map<int,std::vector<int> > adjacenceList;
+    std::map<int,std::vector<int> >::iterator pos;
+    std::vector<int>::iterator it;
+    unsigned int vertex;
+    unsigned int i;
+    short j;
+
+    for(i=0; i<_triangles.size(); ++i){
+        for(j=0; j<_triangles[i].size(); ++j){
+            vertex = _triangles[i][j];
+            pos = adjacenceList.find(vertex);
+            if( pos == adjacenceList.end() )
+                pos = adjacenceList.insert( std::pair<int,std::vector<int> >(vertex, std::vector<int>()) ).first;
+            pos->second.push_back(i);
+        }
+    }
+
+    for(i=0; i<_triangles.size(); ++i){
+        n = _normalsT[i];
+        for(j=0; j<_triangles[i].size(); ++j){
+            sum = n;
+            vertex = _triangles[i][j];
+            std::vector<int> & adjacentTriangles = adjacenceList[vertex];
+            for(it=adjacentTriangles.begin();
+                it != adjacentTriangles.end();
+                ++it){
+                m = _normalsT[*it];
+                if( *it != i && glm::angle(n,m) < angle_threshold ){
+                    sum += m;
+                }
+            }
+            addNormalV(glm::normalize(sum));
+        }
+    }
+}
+
 
 void TriMesh::computeNormalsV(float angle_threshold){
     // Compute a normal for each vertex of each triangle
@@ -379,49 +448,13 @@ void TriMesh::computeNormalsV(float angle_threshold){
     // Only normals whose angle with the current triangle normal
     // is below the angle_threshold is taken into account.
 
-    // the algorithm below favors speed rather than memory
+    _normalsV.clear();
 
+    if(_normalsT.empty() && !_triangles.empty())
+        computeNormalsT();
 
-      my::Normal n,m, sum;
-      std::map<int,std::vector<int> > adjacenceList;
-      std::map<int,std::vector<int> >::iterator pos;
-      std::vector<int>::iterator it;
-      unsigned int vertex;
-      unsigned int i;
-      short j;
-
-      _normalsV.clear();
-
-      if(_normalsT.empty() && !_triangles.empty())
-          computeNormalsT();
-
-      for(i=0; i<_triangles.size(); ++i){
-          for(j=0; j<_triangles[i].size(); ++j){
-              vertex = _triangles[i][j];
-              pos = adjacenceList.find(vertex);
-              if( pos == adjacenceList.end() )
-                  pos = adjacenceList.insert( std::pair<int,std::vector<int> >(vertex, std::vector<int>()) ).first;
-              pos->second.push_back(i);
-          }
-      }
-
-      for(i=0; i<_triangles.size(); ++i){
-          n = _normalsT[i];
-          for(j=0; j<_triangles[i].size(); ++j){
-              sum = n;
-              vertex = _triangles[i][j];
-              std::vector<int> & adjacentTriangles = adjacenceList[vertex];
-              for(it=adjacentTriangles.begin();
-                  it != adjacentTriangles.end();
-                  ++it){
-                  m = _normalsT[*it];
-                  if( *it != i && glm::angle(n,m) < angle_threshold ){
-                      sum += m;
-                  }
-              }
-              addNormalV(glm::normalize(sum));
-          }
-      }
+//    _computeNormalsV_naive(angle_threshold);
+    _computeNormalsV_adjacence(angle_threshold);
 }
 
 double TriMesh::normalize(){

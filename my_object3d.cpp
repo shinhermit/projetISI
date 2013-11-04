@@ -21,6 +21,16 @@ Object3D::~Object3D()
 {
 }
 
+std::string Object3D::getName()
+{
+    return _name;
+}
+
+void Object3D::setName(std::string name)
+{
+    _name = name;
+}
+
 /** 
  * Print 3D object information in terminal
  *

@@ -208,11 +208,13 @@ public:
    * updates the bouding box of the object
    */
   void computeBoundingBox();
-
   /**
    * computes the triangles normals of the 3D mesh
    */
   void computeNormalsT();
+
+  void _computeNormalsV_naive(float angle_threshold=70.);
+  void _computeNormalsV_adjacence(float angle_threshold=70.);
 
   /**
    * computes the vertices normals of the 3D mesh.
@@ -221,7 +223,7 @@ public:
    * @see computeNormalsT
    * @param threshold the angles beyond which two faces are considered to have a sharp edge
    */
-  void computeNormalsV(float threshold=70.);
+  void computeNormalsV(float angle_threshold=70.);
 
   /**
    * scales and centers the objects so it fits in the [-1:1]^3
