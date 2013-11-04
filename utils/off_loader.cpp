@@ -96,14 +96,14 @@ void my::OffLoader::_exceptInvalidValue(const std::string & methodName, const st
     throw std::out_of_range(oss.str());
 }
 
-void my::OffLoader::_getSizes(fstream & file, int & vertex_count, int & face_count, int &edge_count) throw(std::runtime_error)
+void my::OffLoader::_getSizes(int & vertex_count, int & face_count, int &edge_count) throw(std::runtime_error)
 {
     std::ostringstream oss;
     std::istringstream iss;
     std::string line;
     bool invalid;
 
-    _getDataLine(file, line);
+    _getDataLine(_file, line);
     iss.str(line);
 
     invalid = false;
@@ -139,7 +139,7 @@ bool my::OffLoader::_getColor(std::istringstream & iss, float & R, float & G, fl
     return colored;
 }
 
-void my::OffLoader::_getVertices(fstream & file, const int & vertex_count) throw(std::runtime_error)
+void my::OffLoader::_getVertices(const int & vertex_count) throw(std::runtime_error)
 {
     std::string line;
     float x,y,z;
@@ -148,7 +148,7 @@ void my::OffLoader::_getVertices(fstream & file, const int & vertex_count) throw
     int i;
 
     i = 0;
-    while(i < vertex_count && _getDataLine(file, line)){
+    while(i < vertex_count && _getDataLine(_file, line)){
         std::istringstream iss(line);
         //coordinates
         invalid = false;
@@ -173,7 +173,7 @@ void my::OffLoader::_getVertices(fstream & file, const int & vertex_count) throw
     _postGetElement(i, vertex_count, "vertices", "_getVertices");
 }
 
-void my::OffLoader::_getPolygons(fstream & file, const int & face_count) throw(std::runtime_error, std::out_of_range)
+void my::OffLoader::_getPolygons(const int & face_count) throw(std::runtime_error, std::out_of_range)
 {
     std::string line;
     int polygonSize;
@@ -183,7 +183,7 @@ void my::OffLoader::_getPolygons(fstream & file, const int & face_count) throw(s
     my::MeshRefPolygon poly(_mesh);
 
     i=0;
-    while(i < face_count && _getDataLine(file, line)){
+    while(i < face_count && _getDataLine(_file, line)){
         std::istringstream iss(line);
 
         if(! (iss >> polygonSize) )
@@ -215,15 +215,15 @@ void my::OffLoader::_getPolygons(fstream & file, const int & face_count) throw(s
     _postGetElement(i, face_count, "polygons", "_getPolygons");
 }
 
-void my::OffLoader::_getMesh(std::fstream & file) throw(std::runtime_error, std::range_error)
+void my::OffLoader::_getMesh() throw(std::runtime_error, std::range_error)
 {
     int vertex_count, face_count, edge_count;
 
-    _getSizes(file, vertex_count, face_count, edge_count);
+    _getSizes(vertex_count, face_count, edge_count);
 
-    _getVertices(file, vertex_count);
+    _getVertices(vertex_count);
 
-    _getPolygons(file, face_count);
+    _getPolygons(face_count);
 }
 
 my::OffLoader::OffLoader(my::IMesh & receptacle, const std::string & filename, my::IPolygonTriangulator * triangulator) throw(std::invalid_argument)
@@ -241,34 +241,40 @@ my::OffLoader::OffLoader(my::IMesh & receptacle, const std::string & filename, m
 my::OffLoader::~OffLoader()
 {
     delete _triangulator;
+
+    //if interrupted by an exception
+    if(_file.is_open())
+        _file.close();
 }
 
 void my::OffLoader::load()
 {
     std::string line;
     std::ostringstream oss;
-    std::fstream file(_filename.c_str(), std::ios_base::in);
 
-    if(! file.is_open() ){
+    _file.open(_filename.c_str(), std::ios_base::in);
+
+    if( !_file.is_open() ){
         oss << "OffLoader::OffLoader: unable to open file " << _filename << std::endl;
         throw std::invalid_argument(oss.str());
     }
 
     //"OFF" header
-    if(!_getline(file, line)){
+    if(!_getline(_file, line)){
         oss << "OffLoader::OffLoader: file " << _filename << " is empty" << std::endl;
         throw std::invalid_argument(oss.str());
+        //Note: closing file is managed by destrutor
     }
 
     if( line != std::string("OFF") ){
         if(line != "" && line[0] != '#' ){
-            file.seekp(0);
+            _file.seekp(0);
         }
     }
 
-    _getMesh(file);
+    _getMesh();
 
-    file.close();
+    _file.close();
 
     _mesh.normalize();
     _mesh.computeNormalsT();
