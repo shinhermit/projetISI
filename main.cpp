@@ -33,7 +33,7 @@ int main(int argc, char *argv[]){
     bool noProcedural, noFunctional;
 
     //parse commandline
-    my::IsiCommandLine cmd(std::string(argv));
+    my::IsiCommandLine cmd(argc, argv);
     cmd.getParams(filenames, noProcedural, noFunctional);
 
     QApplication app(argc, argv);

@@ -11,10 +11,11 @@ namespace my{
 class IsiCommandLine
 {
 private:
-    const std::string _argv;
+    const int & _argc;
+    const char *const*_argv;
 
 public:
-    IsiCommandLine(const std::string & argv);
+    IsiCommandLine(const int & argc, const char *const*argv);
 
     void getParams(std::vector<std::string> & filenames, bool & noProcedural, bool & noFunctional);
 };
