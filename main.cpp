@@ -9,6 +9,9 @@
  *
  *
  */
+
+#include <tclap/CmdLine.h>
+
 #include <QApplication>
 #include <QMessageBox>
 #include "my_main_window.h"
@@ -19,96 +22,76 @@
 #include "objects/pyramid.h"
 
 #include "my_objects.h"
+#include "utils/isicommandline.h"
 
 #include "my_scene.h"
 
-/**
-* Program usage
-* Should be handled with the tclap library
-*/
-void usage(char* name){
-  cout<< "usage: " << name << " [options]" <<endl;
-  cout<< "options:" <<endl;
-  cout<< "  -h, --help                 shows this message" <<endl;
-  cout<< "  --off file                 loads OFF file" <<endl;
-}
 
 int main(int argc, char *argv[]){
-  QApplication app(argc, argv);
+    TriMesh * off;
+    std::vector<std::string> filenames;
+    bool noProcedural, noFunctional;
 
-  // Parse program arguments here
-  // with the tclap library
-  // http://tclap.sourceforge.net/manual.html
-  //
+    //parse commandline
+    my::IsiCommandLine cmd(std::string(argv));
+    cmd.getParams(filenames, noProcedural, noFunctional);
 
-  // initialize my custom 3D scene
-  float objectRadius = 1.;
-  QPointer<MyScene> myScene = new MyScene(objectRadius);
+    QApplication app(argc, argv);
 
-  //add simple objects
-//  try{
-//      myScene->addObject(new my::GridCube());
-//      myScene->addObject(new my::Grid());
-//      myScene->addObject(new my::Cone(2., 26.5, 10, 10, 1));
-//      //  myScene->addObject(new my::ConicMesh(2., 26.5, 10, 5));
-//      myScene->addObject(new my::Cylinder(2., 1., 10, 10, 1));
-//      //  myScene->addObject(new my::CylindricMesh(2., 1., 10, 5));
-//      myScene->addObject(new my::Torus(0.6, 0.4, 20, 5));
-//      myScene->addObject(new my::Sphere(1., 20, 20));
-//      myScene->addObject(new my::Disk(1., 10, 1));
-//      myScene->addObject(new my::DiskHole(1., 0.3, 20, 3));
-//      myScene->addObject(new my::CubeCorner());
-//  }
-//  catch(const std::invalid_argument & e){
-//      QPointer<QMessageBox> msgbox = new QMessageBox(QMessageBox::Critical, "Exception caught", e.what(), QMessageBox::Ok);
-//      msgbox->show();
-//  }
+    // initialize custom 3D scene
+    float objectRadius = 1.;
+    QPointer<MyScene> myScene = new MyScene(objectRadius);
 
-  myScene->addObject(new Cube());
-  myScene->addObject(new Pyramid());
+    //add simple objects
+    if(!noProcedural){
+        try{
+            myScene->addObject(new my::Cone(2., 26.5, 10, 10, 1));
+            myScene->addObject(new my::Cylinder(2., 1., 10, 10, 1));
+            myScene->addObject(new my::Torus(0.6, 0.4, 20, 5));
+            myScene->addObject(new my::Sphere(1., 20, 20));
+            myScene->addObject(new my::Disk(1., 10, 1));
+            myScene->addObject(new my::DiskHole(1., 0.3, 20, 3));
+            myScene->addObject(new my::CubeCorner(0.5));
 
-  // add surface functions
-  try{
-      myScene->addObject(new my::FuncSurface(50,50, -3.14, 3.14, -3.14, 3.14, my::FuncSinCos()));
-      myScene->addObject(new my::FuncSurface(50,50, -3.14, 3.14, -3.14, 3.14));
-  }
-  catch(const std::invalid_argument & e){
-      QPointer<QMessageBox> msgbox = new QMessageBox(QMessageBox::Critical, "Exception caught", e.what(), QMessageBox::Ok);
-      msgbox->show();
-  }
+            myScene->addObject(new Cube());
+            myScene->addObject(new Pyramid());
+        }
+        catch(const std::invalid_argument & e){
+            QPointer<QMessageBox> msgbox = new QMessageBox(QMessageBox::Critical, "Exception caught", e.what(), QMessageBox::Ok);
+            msgbox->show();
+        }
+    }
 
-  // add user defined OFF files
-  try{
-//      TriMesh * filecorner = new TriMesh("Filecorner");
-//      filecorner->loadOffFile("data/cubecorner.off");
-//      myScene->addObject(filecorner);
+    // add surface functions
+    if(!noFunctional){
+        try{
+            myScene->addObject(new my::FuncSurface(50,50, -3.14, 3.14, -3.14, 3.14, my::FuncSinCos()));
+            myScene->addObject(new my::FuncSurface(50,50, -3.14, 3.14, -3.14, 3.14));
+        }
+        catch(const std::invalid_argument & e){
+            QPointer<QMessageBox> msgbox = new QMessageBox(QMessageBox::Critical, "Exception caught", e.what(), QMessageBox::Ok);
+            msgbox->show();
+        }
+    }
 
-//      TriMesh * venus = new TriMesh("Venus");
-//      venus->loadOffFile("data/venus.off");
-//      myScene->addObject(venus);
+    // add user defined OFF files
+    try{
+        for(int i=0; i < filenames.size(); ++i){
+            off = new TriMesh(filenames[i]);
+            off->loadOffFile(filenames[i]);
+            myScene->addObject(off);
+        }
+    }
+    catch(const std::exception & e){
+        QPointer<QMessageBox> msgbox = new QMessageBox(QMessageBox::Critical, "Exception caught", e.what(), QMessageBox::Ok);
+        msgbox->show();
+    }
 
-//      TriMesh * tref = new TriMesh("Tref");
-//      tref->loadOffFile("data/tref.off");
-//      myScene->addObject(tref);
-
-//      TriMesh * abstr = new TriMesh("Abstr");
-//      abstr->loadOffFile("data/abstr.off");
-//      myScene->addObject(abstr);
-
-      TriMesh * hdodec = new TriMesh("Hdodec");
-      hdodec->loadOffFile("data/hdodec.off");
-      myScene->addObject(hdodec);
-  }
-  catch(const std::exception & e){
-      QPointer<QMessageBox> msgbox = new QMessageBox(QMessageBox::Critical, "Exception caught", e.what(), QMessageBox::Ok);
-      msgbox->show();
-  }
-
-  // initialize my custom main window
-  QPointer<MyMainWindow> myMainWindow = new MyMainWindow(myScene);
-  // display the window
-  myMainWindow->show();
-  // enter in the main loop
-  return app.exec();
+    // initialize my custom main window
+    QPointer<MyMainWindow> myMainWindow = new MyMainWindow(myScene);
+    // display the window
+    myMainWindow->show();
+    // enter in the main loop
+    return app.exec();
 }
 
