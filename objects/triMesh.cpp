@@ -6,6 +6,10 @@ TriMesh::TriMesh(const string &name)
     : Object3D(name)
 {}
 
+TriMesh::~TriMesh()
+{}
+
+
 void TriMesh::addVertex(my::Vertex v)
 {
   extendBoundingBox(v);

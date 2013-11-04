@@ -49,7 +49,7 @@ protected:
 
 public:
   TriMesh(const std::string & name="Trimesh");
-  virtual ~TriMesh(){}
+  virtual ~TriMesh();
 
   /**
    * draws the 3D object

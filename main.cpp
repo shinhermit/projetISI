@@ -34,7 +34,13 @@ int main(int argc, char *argv[]){
 
     //parse commandline
     my::IsiCommandLine cmd(argc, argv);
-    cmd.getParams(filenames, noProcedural, noFunctional);
+    try{
+        cmd.getParams(filenames, noProcedural, noFunctional);
+    }
+    catch(TCLAP::ArgException &e){
+        QPointer<QMessageBox> msgbox = new QMessageBox(QMessageBox::Critical, "Exception caught", e.what(), QMessageBox::Ok);
+        msgbox->show();
+    }
 
     QApplication app(argc, argv);
 
