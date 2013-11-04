@@ -6,11 +6,13 @@ CubeCorner::CubeCorner(float cornerSpread)
     :TriMesh("CubeCorner")
 {
     if(0. < cornerSpread < 1.)
-        _cornerSpread = cornerSpread;
+        _cornerSpread = 2. * cornerSpread;
+    else
+        _cornerSpread = 1; //2 * 0.5
 
     // vertex coordinates
     static const GLfloat vertex[10][3] = {
-        {1-cornerSpread,1,1}, {1,1-cornerSpread,1}, {1,1,1-cornerSpread}, //the corner
+        {1-_cornerSpread,1,1}, {1,1-_cornerSpread,1}, {1,1,1-_cornerSpread}, //the corner
         {-1,1,1}, {-1,-1,1}, {1,-1,1},
         {1,1,-1}, {1,-1,-1}, {-1,-1,-1}, {-1,1,-1}
     };

@@ -213,9 +213,6 @@ public:
    */
   void computeNormalsT();
 
-  void _computeNormalsV_naive(float angle_threshold=70.);
-  void _computeNormalsV_adjacence(float angle_threshold=70.);
-
   /**
    * computes the vertices normals of the 3D mesh.
    *
