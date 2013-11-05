@@ -35,6 +35,23 @@ void TriMesh::addTriangle(int v1, int v2, int v3){
   addTriangle(t);
 }
 
+void TriMesh::updateTriangle(const int & t, const my::Triangle & up) throw(std::out_of_range)
+{
+    if( !(0 <= t && t <= _triangles.size()) )
+        throw std::out_of_range("TriMesh::updateTriangle: triangle indice out of range");
+
+    _triangles[t] = up;
+}
+
+void TriMesh::updateTriangle(const int & t, int v1, int v2, int v3) throw(std::out_of_range)
+{
+    my::Triangle up;
+    up.push_back(v1);
+    up.push_back(v2);
+    up.push_back(v3);
+    updateTriangle(t, up);
+}
+
 void TriMesh::_preSetColor(const int & indice, const int & maxIndice, const Color & color, const string & methodName, const std::string & range) throw(std::invalid_argument)
 {
     std::ostringstream oss;
@@ -333,6 +350,11 @@ int TriMesh::sizeT() const
 my::Vertex TriMesh::getVertex(const int & i)const
 {
     return _vertices.at(i);
+}
+
+int TriMesh::getVertexIndice(const int & triangle, const int & vertexInTriangle) const
+{
+    return _triangles.at(triangle).at(vertexInTriangle);
 }
 
 

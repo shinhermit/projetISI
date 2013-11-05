@@ -51,6 +51,8 @@ int main(int argc, char *argv[]){
     //add simple objects
     if(!noProcedural){
         try{
+            myScene->addObject(new my::IsoSphere(1., 3));
+            myScene->addObject(new my::Octahedron());
             myScene->addObject(new my::Cone(2., 26.5, 10, 10, 1));
             myScene->addObject(new my::Cylinder(2., 1., 10, 10, 1));
             myScene->addObject(new my::Torus(0.6, 0.4, 20, 5));

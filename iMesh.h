@@ -9,6 +9,8 @@
 #ifndef  _IMESH_H_
 #define  _IMESH_H_
 
+#include <stdexcept>
+
 #include "my_types.h"
 
 using namespace std;
@@ -49,6 +51,22 @@ public:
    * @param v3 third vertex of the triangle
    */
     virtual void addTriangle(int v1, int v2, int v3)=0;
+
+    /**
+   * updates the vertices of a triangle in the mesh
+   * @param t indice of the triangle to be updated
+   * @param up up to date triangle
+   */
+    virtual void updateTriangle(const int & t, const my::Triangle & up) throw(std::out_of_range)=0;
+
+    /**
+   * updates the vertices of a triangle in the mesh
+   * @param t indice of the triangle to be updated
+   * @param v1 first vertex of the triangle
+   * @param v2 second vertex of the triangle
+   * @param v3 third vertex of the triangle
+   */
+    virtual void updateTriangle(const int & t, int v1, int v2, int v3) throw(std::out_of_range)=0;
 
     /**
    * Set the color of the vertex indiced by the given argument
@@ -134,6 +152,13 @@ public:
    * @param index the index of the vertex
    */
     virtual my::Vertex getVertex(const int & index)const=0;
+
+    /**
+   * gets a vertex indice relatively to a triangle
+   * @param triangle index of the triangle
+   * @param vertexInTriangle index of vertex in the triangle (0, 1 or 2)
+   */
+    virtual int getVertexIndice(const int & triangle, const int & vertexInTriangle)const=0;
 
 
     /**

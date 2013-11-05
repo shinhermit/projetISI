@@ -13,5 +13,7 @@
 #include "objects/grid.h"
 #include "objects/gridcube.h"
 #include "objects/funcsurface.h"
+#include "objects/octahedron.h"
+#include "objects/isosphere.h"
 
 #endif // MY_OBJECTS_H

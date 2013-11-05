@@ -16,6 +16,7 @@ typedef glm::vec3  Normal;
 typedef std::vector<int> Triangle;
 typedef std::pair<float,float> Parameters;
 typedef std::pair<int,int> Range;
+typedef std::pair<int,int> Edge;
 
 typedef enum{CLOCKWISE, COUNTER_CLOCKWISE} Orientation;
 }

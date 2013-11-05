@@ -101,6 +101,22 @@ public:
    */
   void addTriangle(int v1, int v2, int v3);
 
+  /**
+ * updates the vertices of a triangle in the mesh
+ * @param t indice of the triangle to be updated
+ * @param up up to date triangle
+ */
+  void updateTriangle(const int & t, const my::Triangle & up) throw(std::out_of_range);
+
+  /**
+ * updates the vertices of a triangle in the mesh
+ * @param t indice of the triangle to be updated
+ * @param v1 first vertex of the triangle
+ * @param v2 second vertex of the triangle
+ * @param v3 third vertex of the triangle
+ */
+  void updateTriangle(const int & t, int v1, int v2, int v3) throw(std::out_of_range);
+
   void _preSetColor(const int & indice, const int & maxIndice, const my::Color & color, const std::string & methodName, const std::string & maxIndiceName="") throw(std::invalid_argument);
 
   /**
@@ -204,6 +220,13 @@ public:
    * @param index the index of the vertex
    */
   my::Vertex getVertex(const int & index)const;
+
+  /**
+ * gets a vertex relatively to a triangle
+ * @param triangle index of the triangle
+ * @param vertexInTriangle index of vertex in the triangle (0, 1 or 2)
+ */
+  int getVertexIndice(const int & triangle, const int & vertexInTriangle)const;
 
   virtual std::string toString();
   virtual void toOStream(std::ostream& out=std::cout) const;
