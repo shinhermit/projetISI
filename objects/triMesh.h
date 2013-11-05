@@ -45,11 +45,15 @@ protected:
   std::vector<my::Triangle> _triangles;
   std::vector<my::Normal>   _normalsT;
   std::vector<my::Normal>   _normalsV;
-  std::map<int, my::Color> _colors;
+  std::map<unsigned int, my::Color> _colorsV;
+  std::map<unsigned int, my::Color> _colorsT;
 
 public:
   TriMesh(const std::string & name="Trimesh");
   virtual ~TriMesh();
+
+  void _preGetColor(const unsigned int & triangle, const unsigned int & vertex)const throw(std::out_of_range);
+  bool _getColor(const unsigned int & triangle, const unsigned int & vertex, my::Color & col)const;
 
   /**
    * draws the 3D object

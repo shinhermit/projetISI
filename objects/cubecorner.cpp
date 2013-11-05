@@ -8,7 +8,7 @@ CubeCorner::CubeCorner(float cornerSpread)
     if(0. < cornerSpread < 1.)
         _cornerSpread = 2. * cornerSpread;
     else
-        _cornerSpread = 1; //2 * 0.5
+        _cornerSpread = 1.; //2 * 0.5
 
     // vertex coordinates
     static const GLfloat vertex[10][3] = {

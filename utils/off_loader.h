@@ -49,7 +49,7 @@ private:
     void _getVertices(const int & vertex_count) throw(std::runtime_error);
     void _getPolygons(const int & face_count) throw(std::runtime_error, std::out_of_range);
     void _getMesh() throw(std::runtime_error, std::range_error);
-    void _addTriangles(my::MeshRefPolygon & polygon);
+    void _addTriangles(my::MeshRefPolygon & polygon, const my::Color * col=0);
 public:
     ~OffLoader();
     OffLoader(my::IMesh & receptacle, const std::string & filename, my::IPolygonTriangulator * triangulator=0) throw(std::invalid_argument);

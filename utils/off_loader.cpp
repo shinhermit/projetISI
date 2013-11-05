@@ -1,6 +1,6 @@
 #include "off_loader.h"
 
-void my::OffLoader::_addTriangles(my::MeshRefPolygon & poly)
+void my::OffLoader::_addTriangles(my::MeshRefPolygon & poly, const my::Color * col)
 {
     std::ostringstream oss;
     std::vector<my::Triangle> triangulation;
@@ -8,6 +8,8 @@ void my::OffLoader::_addTriangles(my::MeshRefPolygon & poly)
 
     if(poly.size() == 3){
         _mesh.addTriangle(poly.vertexRef(0), poly.vertexRef(1), poly.vertexRef(2));
+        if(col)
+            _mesh.setTriangleColor(_mesh.sizeT()-1, *col);
     }
 
     else if(poly.size() > 3){
@@ -15,6 +17,8 @@ void my::OffLoader::_addTriangles(my::MeshRefPolygon & poly)
 
         for(it=triangulation.begin(); it != triangulation.end(); ++it){
             _mesh.addTriangle(poly.vertexRef(it->at(0)), poly.vertexRef(it->at(1)), poly.vertexRef(it->at(2)));
+            if(col)
+                _mesh.setTriangleColor(_mesh.sizeT()-1, *col);
         }
         ++_nbTriangulatedFaces;
     }
@@ -164,7 +168,7 @@ void my::OffLoader::_getVertices(const int & vertex_count) throw(std::runtime_er
 
         _mesh.addVertex(x,y,z);
 
-        if(_getColor(iss, R,G,G,A))
+        if(_getColor(iss, R,G,B,A))
             _mesh.setVertexColor(_mesh.sizeV()-1, R,G,B,A);
 
         ++i;
@@ -178,6 +182,7 @@ void my::OffLoader::_getPolygons(const int & face_count) throw(std::runtime_erro
     std::string line;
     int polygonSize;
     float R,G,B,A;
+    my::Color col;
     int i, j;
     int vertex;
     my::MeshRefPolygon poly(_mesh);
@@ -201,13 +206,12 @@ void my::OffLoader::_getPolygons(const int & face_count) throw(std::runtime_erro
 
         _postGetElement(j, polygonSize, "vertices in polygon", "_getPolygons");
 
-        _addTriangles(poly);
-
         if(_getColor(iss, R,G,B,A)){
-            for(int i=0; i < poly.size(); ++i){
-                _mesh.setVertexColor(poly.vertexRef(i), R,G,B,A);
-            }
+            col = my::Color(R,G,B,A);
+            _addTriangles(poly, &col);
         }
+        else
+            _addTriangles(poly);
 
         ++i;
     }

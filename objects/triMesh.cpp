@@ -10,6 +10,7 @@ TriMesh::~TriMesh()
 {}
 
 
+
 void TriMesh::addVertex(my::Vertex v)
 {
   extendBoundingBox(v);
@@ -65,7 +66,7 @@ void TriMesh::_preSetColor(const int & indice, const int & maxIndice, const Colo
 void TriMesh::setVertexColor(const int & vertex, const my::Color & color)
 {
     _preSetColor(vertex, sizeV(), color, "setVertexColor", "[0,sizeV()]");
-    _colors[vertex] = color;
+    _colorsV[vertex] = color;
 }
 
 void TriMesh::setVertexColor(const int & vertex, const float & R, const float & G, const float & B, const float & A)
@@ -76,10 +77,7 @@ void TriMesh::setVertexColor(const int & vertex, const float & R, const float & 
 void TriMesh::setTriangleColor(const int & t, const my::Color & color)
 {
     _preSetColor(t, sizeT(), color, "setTriangleColor", "[0,sizeT()]");
-    for(int i=0; i < _triangles[t].size(); ++i){
-        const int & vertex = _triangles[t][i];
-        _colors[vertex] = color;
-    }
+        _colorsT[t] = color;
 }
 
 void TriMesh::setTriangleColor(const int & t, const float & R, const float & G, const float & B, const float & A)
@@ -394,17 +392,17 @@ void TriMesh::computeNormalsV(float angle_threshold){
     if(_normalsT.empty() && !_triangles.empty())
         computeNormalsT();
 
-    for(i=0; i<_triangles.size(); ++i){
+    for(i=0; i<_triangles.size(); ++i){ //O(3*t*log(v))=O(t*log(v))
         for(j=0; j<_triangles[i].size(); ++j){
             vertex = _triangles[i][j];
-            pos = adjacenceList.find(vertex);
+            pos = adjacenceList.find(vertex); //O(log(v))
             if( pos == adjacenceList.end() )
                 pos = adjacenceList.insert( std::pair<int,std::vector<int> >(vertex, std::vector<int>()) ).first;
             pos->second.push_back(i);
         }
     }
 
-    for(i=0; i<_triangles.size(); ++i){
+    for(i=0; i<_triangles.size(); ++i){//best O(3*t)=O(t); worst O(t^2); average O(3*4*t)=O(t)
         n = _normalsT[i];
         for(j=0; j<_triangles[i].size(); ++j){
             sum = n;
@@ -454,13 +452,67 @@ void TriMesh::toOStream(std::ostream& out) const{
   out << "   t: " << _triangles.size() << std::endl;
 }
 
+void TriMesh::_preGetColor(const unsigned int & triangle, const unsigned int & vertex)const throw(std::out_of_range)
+{
+    std::ostringstream oss;
+    bool colT, colV, invalid = false;
 
+    colT = _triangles.size() == _colorsT.size();
+    colV = _vertices.size() == _colorsV.size();
+
+    if(colT && !(0<=triangle && triangle <= _colorsT.size()) ){
+        oss << "TriMesh::_preGetColor: indice of triangle is out of triangles colors vector's range" << std::endl
+            << "\t given indice is " << triangle << std::endl
+            << "\t triangles colors vector's size is " << _colorsT.size() << std::endl;
+        invalid = true;
+    }
+
+    if(colV && !(0<=vertex && vertex <= _colorsV.size()) ){
+        oss << "TriMesh::_preGetColor: indice of vertex is out of vertices colors vector's range" << std::endl
+            << "\t given indice is " << vertex << std::endl
+            << "\t triangles vertices vector's size is " << _colorsV.size() << std::endl;
+        invalid = true;
+    }
+
+    if(invalid)
+        throw std::out_of_range(oss.str());
+}
+
+bool TriMesh::_getColor(const unsigned int  & triangle, const unsigned int & vertex, my::Color & col)const
+{
+    bool colT, colV;
+    int R, G, B;
+    float A;
+    my::Color sum;
+
+    _preGetColor(triangle, vertex);
+
+    colT = _triangles.size() == _colorsT.size();
+    colV = _vertices.size() == _colorsV.size();
+
+    if(colT && !colV)
+        col = _colorsT.at(triangle);
+    else if(colV && !colT)
+        col = _colorsV.at(vertex);
+    else if(colT && colV){
+        sum = _colorsT.at(triangle) + _colorsV.at(vertex); //attention, exception
+
+        R = (int)(sum[0]*255) % 256;
+        G = (int)(sum[1]*255) % 256;
+        B = (int)(sum[2]*255) % 256;
+        A = (sum[3] > 1.) ? 1. : sum[3];
+
+        col =  my::Color((float)R / 255., (float)G / 255., (float)B / 255., A);
+    }
+
+    return (colV || colT);
+}
 
 void TriMesh::draw(bool flipnormals){
   unsigned int i,t;
   bool smooth;
   my::Normal n;
-  std::map<int,my::Color>::iterator it;
+  my::Color col;
 
   GLint mode[1];
   glGetIntegerv(GL_SHADE_MODEL, mode);
@@ -471,29 +523,29 @@ void TriMesh::draw(bool flipnormals){
 
   if(smooth){
       glBegin(GL_TRIANGLES);
-      for(t=0; t<_triangles.size(); ++t)
+      for(t=0; t<_triangles.size(); ++t){
         for(i=0; i<3; i++){
             n=_normalsV[3*t+i];
             if(flipnormals) n*=-1;
 
-            it = _colors.find(_triangles[t][i]);
-            if(it != _colors.end())
-                glColor4f(it->second[0], it->second[1], it->second[2], it->second[3]);
+            if(_getColor(t,i,col))
+                glColor4f(col[0], col[1], col[2], col[3]);
 
             glNormal3fv(glm::value_ptr(n));
             glVertex3fv(glm::value_ptr(_vertices[_triangles[t][i]]));
           }
+      }
       glEnd();
     }else{
       glBegin(GL_TRIANGLES);
       for(t=0; t<_triangles.size(); ++t){
-          n=_normalsT[t];
+          n=_normalsT[t];          
           if(flipnormals) n*=-1;
           glNormal3fv(glm::value_ptr(n));
+
           for(i=0; i<3; i++){
-              it = _colors.find(_triangles[t][i]);
-              if(it != _colors.end())
-                  glColor4f(it->second[0], it->second[1], it->second[2], it->second[3]);
+              if(_getColor(t,i,col))
+                  glColor4f(col[0], col[1], col[2], col[3]);
 
               glVertex3fv(glm::value_ptr(_vertices[_triangles[t][i]]));
           }
