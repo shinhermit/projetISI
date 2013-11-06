@@ -1,3 +1,11 @@
+/**
+ * @author Josuah Aron
+ * @date   Oct 2013
+ *
+ * An opened Cone
+ *
+ *
+ */
 #ifndef CONICMESH_H
 #define CONICMESH_H
 
@@ -14,7 +22,14 @@ private:
     int _nbSlices;
     int _nbStacks;
 
+    /**
+      *@see my::ParametricMesh::_sampled
+      */
     my::Parameters _sampled(const int & i, const int & j)const throw(std::logic_error, std::invalid_argument);
+
+    /**
+      *@see my::ParametricMesh::_indiceOfSampled
+      */
     int _indiceOfSampled(const int & i, const int & j)const throw(std::logic_error, std::invalid_argument);
 
     void _preConicMesh(const float & height, const float & aperture, const int & nbSlices, const int & nbStacks) throw(std::invalid_argument);

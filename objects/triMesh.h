@@ -1,8 +1,9 @@
 /**
  * @author Bruno Jobard
- * @date   Oct 2012
+ * @author Josuah Aron
+ * @date   Oct 2012, Oct 2013
  *
- *  Defines 3D triangular mesh
+ * Base implementation of my::IMesh
  *
  *
  */
@@ -30,7 +31,6 @@
 
 
 
-using namespace std;
 /** 
  * Simple Triangular Mesh Object
  * Imesh is an interface (thus with no attributes), so multiple inheritance is not problematic.
@@ -102,14 +102,14 @@ public:
   void addTriangle(int v1, int v2, int v3);
 
   /**
- * updates the vertices of a triangle in the mesh
+ * updates the vertices (indices) of a triangle in the mesh
  * @param t indice of the triangle to be updated
- * @param up up to date triangle
+ * @param up up-to-date triangle
  */
   void updateTriangle(const int & t, const my::Triangle & up) throw(std::out_of_range);
 
   /**
- * updates the vertices of a triangle in the mesh
+ * updates the vertices (indices) of a triangle in the mesh
  * @param t indice of the triangle to be updated
  * @param v1 first vertex of the triangle
  * @param v2 second vertex of the triangle
@@ -130,24 +130,30 @@ public:
   /**
  * Set the color of the vertex indiced by the given argument
  * @param vertex indice of the vertex that is to be colored
- * @param col RGBA color of the vertice
- * @example setColor(0, my::Color(0.3,0.4,0.1,1);
+ * @param R Red component of the color of the vertice
+ * @param G Green component of the color of the vertice
+ * @param B Bleu component of the color of the vertice
+ * @param A Alpha component of the color of the vertice
+ * @example setVertexColor(0, 0.3,0.4,0.1,1);
  */
   void setVertexColor(const int & vertex, const float & R, const float & G, const float & B, const float & A);
 
   /**
- * Set the color of the vertices of the tirnagle indiced by the given argument
+ * Set the color of the vertices of the triangle indiced by the given argument
  * @param triangle indice of the triangle that is to be colored
  * @param col RGBA color of the vertice
- * @example setColor(0, my::Color(0.3,0.4,0.1,1);
+ * @example setTriangleColor(0, my::Color(0.3,0.4,0.1,1));
  */
   void setTriangleColor(const int & t, const my::Color & color);
 
   /**
- * Set the color of the vertices of the tirnagle indiced by the given argument
+ * Set the color of the vertices of the triangle indiced by the given argument
  * @param triangle indice of the triangle that is to be colored
- * @param col RGBA color of the vertice
- * @example setColor(0, my::Color(0.3,0.4,0.1,1);
+ * @param R Red component of the color of the vertice
+ * @param G Green component of the color of the vertice
+ * @param B Bleu component of the color of the vertice
+ * @param A Alpha component of the color of the vertice
+ * @example setTriangleColor(0, 0.3,0.4,0.1,1);
  */
   void setTriangleColor(const int & t, const float & R, const float & G, const float & B, const float & A);
 
@@ -164,7 +170,7 @@ public:
   void addNormalV(my::Normal n);
 
   /**
-   * includes the geometry (vertices and triangle) of another TriMesh in the current mesh
+   * includes the geometry (vertices and triangles) of another TriMesh in the current mesh
    * @param mesh the mesh we want to include
    */
   void includeMesh(const TriMesh & mesh);
@@ -172,6 +178,7 @@ public:
   /**
    * loads a mesh from an OFF file.
    * @param filename name of the OFF file which contains the data.
+   * @param triangulator an object implemting my::IPolygonTriangulator that will be used to triangulate polygon with more than 3 vertices. Memory freeing is managed by the my::OffLoader object that is internally instanciated by this method.
    */
   void loadOffFile(const std::string & filename, my::IPolygonTriangulator * triangulator=0);
 
@@ -182,6 +189,7 @@ public:
    * Collapses the vertice indiced by slave on the vertice indiced by master, meaning that the resulting vertice is geometrically equivalent to master.
    * @param slave indice of the vertex that will be collapsed on the other
    * @param master indice of the vertex that will remain after caollapsing
+   * @param computeNormals tell whether this method should compute normals (used as final treatment) or not (used as intermediary treatment).
    */
   void collapseVertices(const int & slave, const int & master, bool computeNormals=false);
 

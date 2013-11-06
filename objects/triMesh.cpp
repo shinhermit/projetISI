@@ -2,7 +2,7 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-TriMesh::TriMesh(const string &name)
+TriMesh::TriMesh(const std::string &name)
     : Object3D(name)
 {}
 
@@ -52,7 +52,7 @@ void TriMesh::updateTriangle(const int & t, int v1, int v2, int v3) throw(std::o
     updateTriangle(t, up);
 }
 
-void TriMesh::_preSetColor(const int & indice, const int & maxIndice, const Color & color, const string & methodName, const std::string & range) throw(std::invalid_argument)
+void TriMesh::_preSetColor(const int & indice, const int & maxIndice, const Color & color, const std::string & methodName, const std::string & range) throw(std::invalid_argument)
 {
     std::ostringstream oss;
     bool invalid = false;
@@ -148,7 +148,7 @@ void TriMesh::includeMesh(const TriMesh & mesh)
     }
 }
 
-void TriMesh::loadOffFile(const string & filename, my::IPolygonTriangulator * triangulator)
+void TriMesh::loadOffFile(const std::string & filename, my::IPolygonTriangulator * triangulator)
 {
     my::OffLoader off(*this, filename, triangulator);
     off.load();
@@ -446,7 +446,7 @@ void TriMesh::computeNormalsV(float angle_threshold){
 double TriMesh::normalize(){
   glm::vec3 size=_bBoxMax-_bBoxMin;
   glm::vec3 c=getBoundingBoxCenter();
-  double scale=2/max(size.x, max(size.y,size.z));
+  double scale=2/std::max(size.x, std::max(size.y,size.z));
 
   for(unsigned int i=0; i<_vertices.size(); ++i){
       _vertices[i]+=c;
@@ -463,7 +463,7 @@ double TriMesh::normalize(){
 
 
 std::string TriMesh::toString(){
-  ostringstream oss;
+  std::ostringstream oss;
   oss<< "["<< _name <<" v:"<< _vertices.size() <<", t:"<< _triangles.size() <<"]";
   return oss.str();
 }

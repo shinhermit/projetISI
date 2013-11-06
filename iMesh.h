@@ -1,8 +1,8 @@
 /**
- * @author Bruno Jobard
- * @date   Oct 2012
+ * @author Josuah Aron, from Bruno Jobar's TriMesh
+ * @date   Oct 2013
  *
- *  Defines 3D triangular mesh
+ *  Interface of 3D triangular mesh.
  *
  *
  */
@@ -13,13 +13,12 @@
 
 #include "my_types.h"
 
-using namespace std;
-/** 
+namespace my{
+
+/**
  * Interface for Mesh Objects
  *
  */
-namespace my{
-
 class IMesh
 {
 public:
@@ -53,14 +52,14 @@ public:
     virtual void addTriangle(int v1, int v2, int v3)=0;
 
     /**
-   * updates the vertices of a triangle in the mesh
+   * updates the vertices (indices) of a triangle in the mesh
    * @param t indice of the triangle to be updated
-   * @param up up to date triangle
+   * @param up up-to-date triangle
    */
     virtual void updateTriangle(const int & t, const my::Triangle & up) throw(std::out_of_range)=0;
 
     /**
-   * updates the vertices of a triangle in the mesh
+   * updates the vertices (indices) of a triangle in the mesh
    * @param t indice of the triangle to be updated
    * @param v1 first vertex of the triangle
    * @param v2 second vertex of the triangle
@@ -79,23 +78,30 @@ public:
     /**
    * Set the color of the vertex indiced by the given argument
    * @param vertex indice of the vertex that is to be colored
-   * @param col RGBA color of the vertice
-   * @example setColor(0, my::Color(0.3,0.4,0.1,1);
+   * @param R Red component of the color of the vertice
+   * @param G Green component of the color of the vertice
+   * @param B Bleu component of the color of the vertice
+   * @param A Alpha component of the color of the vertice
+   * @example setVertexColor(0, my::Color(0.3,0.4,0.1,1);
    */
     virtual void setVertexColor(const int & vertex, const float & R, const float & G, const float & B, const float & A)=0;
 
     /**
-   * Set the color of the vertices of the tirnagle indiced by the given argument
+   * Set the color of the vertices of the triangle indiced by the given argument
    * @param triangle indice of the triangle that is to be colored
    * @param col RGBA color of the vertice
-   * @example setColor(0, my::Color(0.3,0.4,0.1,1);
+   * @example setTriangleColor(0, my::Color(0.3,0.4,0.1,1));
    */
     virtual void setTriangleColor(const int & triangle, const my::Color & col)=0;
+
     /**
-   * Set the color of the vertices of the tirnagle indiced by the given argument
+   * Set the color of the vertices of the triangle indiced by the given argument
    * @param triangle indice of the triangle that is to be colored
-   * @param col RGBA color of the vertice
-   * @example setColor(0, my::Color(0.3,0.4,0.1,1);
+   * @param R Red component of the color of the vertice
+   * @param G Green component of the color of the vertice
+   * @param B Bleu component of the color of the vertice
+   * @param A Alpha component of the color of the vertice
+   * @example setTriangleColor(0, 0.3,0.4,0.1,1);
    */
     virtual void setTriangleColor(const int & triangle, const float & R, const float & G, const float & B, const float & A)=0;
 
@@ -116,6 +122,7 @@ public:
    * Collapses the vertice indiced by slave on the vertice indiced by master, meaning that the resulting vertice is geometrically equivalent to master.
    * @param slave indice of the vertex that will be collapsed on the other
    * @param master indice of the vertex that will remain after caollapsing
+   * @param computeNormals tell whether this method should compute normals (used as final treatment) or not (used as intermediary treatment).
    */
     virtual void collapseVertices(const int & slave, const int & master, bool computeNormals=false)=0;
 

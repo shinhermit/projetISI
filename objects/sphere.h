@@ -1,3 +1,11 @@
+/**
+ * @author Josuah Aron
+ * @date   Oct 2013
+ *
+ * An Sphere
+ *
+ *
+ */
 #ifndef SPHERE_H
 #define SPHERE_H
 
@@ -13,7 +21,13 @@ private:
     float _nbSlices;
     float _nbStacks;
 
+    /**
+      *@see my::ParametricMesh::_sampled
+      */
     my::Parameters _sampled(const int & i, const int & j)const throw(std::logic_error, std::invalid_argument);
+    /**
+      *@see my::ParametricMesh::_indiceOfSampled
+      */
     int _indiceOfSampled(const int & i, const int & j)const throw(std::logic_error, std::invalid_argument);
 
     void _preSphere(const float & radius, const int & nbSlices, const int & nbStacks) throw(std::invalid_argument);

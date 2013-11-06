@@ -52,7 +52,7 @@ void my::MeshRefPolygon::addRef(const int & ref)
     _vertexRefs.push_back(ref);
 }
 
-void my::MeshRefPolygon::_preIndice(const int & ref, const string & method)const throw(std::out_of_range)
+void my::MeshRefPolygon::_preIndice(const int & ref, const std::string & method)const throw(std::out_of_range)
 {
     std::ostringstream oss;
 
@@ -96,7 +96,7 @@ int my::MeshRefPolygon::vertexRef(const int &i) const throw(std::out_of_range)
     return _vertexRefs.at(i);
 }
 
-string my::MeshRefPolygon::toString() const
+std::string my::MeshRefPolygon::toString() const
 {
     std::ostringstream oss;
 

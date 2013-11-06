@@ -1,3 +1,11 @@
+/**
+ * @author Josuah Aron
+ * @date   Oct 2013
+ *
+ * An opened Cylinder
+ *
+ *
+ */
 #ifndef CYLINDRICMESH_H
 #define CYLINDRICMESH_H
 
@@ -14,7 +22,13 @@ private:
     int _nbSlices;
     int _nbStacks;
 
+    /**
+      *@see my::ParametricMesh::_sampled
+      */
     my::Parameters _sampled(const int & i, const int & j)const throw(std::logic_error, std::invalid_argument);
+    /**
+      *@see my::ParametricMesh::_indiceOfSampled
+      */
     int _indiceOfSampled(const int & i, const int & j)const throw(std::logic_error, std::invalid_argument);
 
     void _preCylindricMesh(const float & height, const float & radius, const int & nbSlices, const int & nbStacks);

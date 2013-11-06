@@ -1,3 +1,11 @@
+/**
+ * @author Josuah Aron
+ * @date   Oct 2013
+ *
+ * A corned Cube
+ *
+ *
+ */
 #ifndef CUBECORNER_H
 #define CUBECORNER_H
 

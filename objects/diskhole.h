@@ -1,3 +1,11 @@
+/**
+ * @author Josuah Aron
+ * @date   Oct 2013
+ *
+ * An Disk with a center hole
+ *
+ *
+ */
 #ifndef DISKHOLE_H
 #define DISKHOLE_H
 
@@ -14,7 +22,13 @@ private:
     int _nbSlices;
     int _nbCirc;
 
+    /**
+      *@see my::ParametricMesh::_sampled
+      */
     my::Parameters _sampled(const int & i, const int & j)const throw(std::logic_error, std::invalid_argument);
+    /**
+      *@see my::ParametricMesh::_indiceOfSampled
+      */
     int _indiceOfSampled(const int & i, const int & j)const throw(std::logic_error, std::invalid_argument);
 
     void _preDiskHole(const float & bigRadius, const float & smallRadius, const int & nbSlices, const int & nbCirc) throw(std::invalid_argument);

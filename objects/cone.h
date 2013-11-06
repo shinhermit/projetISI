@@ -1,3 +1,11 @@
+/**
+ * @author Josuah Aron
+ * @date   Oct 2013
+ *
+ * A closed Cone
+ *
+ *
+ */
 #ifndef CONE_H
 #define CONE_H
 

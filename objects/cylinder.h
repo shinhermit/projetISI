@@ -1,3 +1,11 @@
+/**
+ * @author Josuah Aron
+ * @date   Oct 2013
+ *
+ * A closed Cylinder
+ *
+ *
+ */
 #ifndef CYLINDER_H
 #define CYLINDER_H
 

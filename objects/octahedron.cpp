@@ -1,6 +1,6 @@
 #include "octahedron.h"
 
-my::Octahedron::Octahedron(const float & adius)
+my::Octahedron::Octahedron(const float & radius)
     :TriMesh("Octahedron")
 {
     /****** vertices ******/
