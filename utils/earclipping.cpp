@@ -12,26 +12,24 @@ int my::EarClipping::_cyclicNext(const int & vertex) const
 
 bool my::EarClipping::_convexVertex(const int & vertex)const
 {
-    int nextRef, prevRef, A, B, C;
-    my::Vector BA, BC;
-    float angle;
+    int nextRef, prevRef, iA, iB, iC;
+    my::Vertex A, B, C;
+    my::Vector tv; //triangle orientation vector
 
     prevRef = _cyclicPrev(vertex);
     nextRef = _cyclicNext(vertex);
 
-    A = _currentPoly[prevRef];
-    B = _currentPoly[vertex];
-    C = _currentPoly[nextRef];
+    iA = _currentPoly[prevRef];
+    iB = _currentPoly[vertex];
+    iC = _currentPoly[nextRef];
 
-    BA = _poly->vertex(A) - _poly->vertex(B);
-    BC = _poly->vertex(C) - _poly->vertex(B);
+    A = _poly->vertex(iA);
+    B = _poly->vertex(iB);
+    C = _poly->vertex(iC);
 
-    if(_orientation == my::CLOCKWISE)
-        angle = my::Geometry::angle360(BA, BC);
-    else
-        angle = my::Geometry::angle360(BC, BA);
+    tv = glm::cross(B,C) + glm::cross(C,A) + glm::cross(A,B);
 
-    return (angle < 180);
+    return ( glm::dot(_orientation, tv) > 0 );
 }
 
 bool my::EarClipping::_insideTriangle(const my::Point & A, const my::Point & B, const my::Point & C, const my::Point & M)const
@@ -74,6 +72,9 @@ bool my::EarClipping::_earVertex(const int & vertexRef)const
             contains = _insideTriangle(A, B, C, _poly->vertex(_currentPoly[i]));
         ++i;
     }
+
+    if(contains)
+        std::cout << "EarClipping::_earVertex: convex vertex " << vertexRef << " triangle contains vertex " << _currentPoly[i-1] << std::endl;
 
     return !contains;
 }
@@ -128,6 +129,16 @@ void my::EarClipping::_checkConvexityChanges(const int & vertex)
                 _earVertices.push_back(vertex);
             }
             else{
+                _convexVertices.push_back(vertex);
+            }
+        }
+    }
+
+    else{
+        std::deque<int>::iterator it = std::find(_earVertices.begin(), _earVertices.end(), vertex);
+        if(it != _earVertices.end()){
+            if(!_earVertex(vertex)){
+                _earVertices.erase(it);
                 _convexVertices.push_back(vertex);
             }
         }
@@ -210,7 +221,7 @@ void my::EarClipping::_clearLists()
 void my::EarClipping::_init(const my::IPolygon & poly, std::vector<my::Triangle> & triangulation)
 {
     _poly = &poly;
-    _orientation = poly.orientation();
+    _orientation = poly.orientationVector();
     _triangulation = &triangulation;
 
     _clearLists();

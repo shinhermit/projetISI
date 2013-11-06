@@ -97,11 +97,27 @@ public:
     virtual my::PlanarExpression basePlaneExpression()const=0;
 
     /**
-      *Provides the signed area of the polygon, that is it's determinant.
+      * Provides the orientation vector of the polygon.
+      * Orientation vector is a normal vector computed by successive vectors cross products.
+      * The magnitude of the vector is the area of the polygon.
+      *@return the polygon's orientation vector
+      */
+    virtual my::Vector orientationVector()const=0;
+
+    /**
+      *Provides the orientation of the polygon, as my::CLOCKWISE or my::COUNTER_CLOCKWISE, in relation to a sighting vector.
+      *@param sightingVector the sighting vector
+      *@return the orientation of the polygon
+     */
+    virtual my::Orientation orientation(const my::Vector & sightingVector)const=0;
+
+    /**
+      *Provides the signed area of the polygon, in relation to the sighting vector.
       * This allows to know the orientation of the polygon. The area of the polygon is given by the absolute value of the signed area.
+      *@param sightingVector the sighting vector
       *@return Value of the signed area of the polygon
       */
-    virtual float signedArea()const=0;
+    virtual float signedArea(const my::Vector & sightingVector)const=0;
 
     /**
       *Provides the area of the polygon.
@@ -109,12 +125,6 @@ public:
       *@return the area of the polygon
       */
     virtual float area()const=0;
-
-    /**
-      *Provides the orientation of the polygon, as my::CLOCKWISE or my::COUNTER_CLOCKWISE
-      *@return the orientation of the polygon
-      */
-    virtual my::Orientation orientation()const=0;
 
     /**
       *Provides the circumference of the polygon.

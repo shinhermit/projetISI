@@ -55,20 +55,25 @@ public:
     virtual my::PlanarExpression basePlaneExpression()const;
 
     /**
+      *@see my::IPolygon::orientationVector
+      */
+    virtual my::Vector orientationVector()const;
+
+    /**
+      *@see my::IPolygon::orientation
+     */
+    virtual my::Orientation orientation(const my::Vector & sightingVector)const;
+
+
+    /**
       *@see my::IPolygon::signedArea
       */
-    virtual float signedArea()const;
+    virtual float signedArea(const my::Vector & sightingVector)const;
 
     /**
       *@see my::IPolygon::area
       */
     virtual float area()const;
-
-    /**
-      *@see my::IPolygon::orientation
-      */
-    virtual my::Orientation orientation()const;
-
 
     /**
       *@see my::IPolygon::circumference

@@ -2,9 +2,14 @@
 
 my::PlanarExpression::PlanarExpression(const my::Point & A, const my::Vector & u, const my::Vector & v)
 {
-    _a = u[1]*v[2] - u[2]*v[1];
-    _b = u[2]*v[0] - u[0]*v[2];
-    _c = u[0]*v[1] - u[1]*v[0];
+    my::Vector u0, v0;
+
+    u0 = glm::normalize(u);
+    v0 = glm::normalize(v);
+
+    _a = u0[1]*v0[2] - u0[2]*v0[1];
+    _b = u0[2]*v0[0] - u0[0]*v0[2];
+    _c = u0[0]*v0[1] - u0[1]*v0[0];
     _d = -_a*A[0] - _b*A[1] - _c*A[2];
 }
 

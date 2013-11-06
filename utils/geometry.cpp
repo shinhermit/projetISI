@@ -8,7 +8,7 @@ float my::Geometry::angle(const my::Vector & u, const my::Vector & v)
     u0 = glm::normalize(u);
     v0 = glm::normalize(v);
 
-    my::PlanarExpression equation(my::Point(0,0,0), u0, glm::cross(u0,v0));
+    my::PlanarExpression equation(my::Point(0,0,0), u0, glm::normalize(glm::cross(u0,v0)));
 
     sign = ( equation(v0[0],v0[1],v0[2]) >= 0 ) ? -1 : 1;
 

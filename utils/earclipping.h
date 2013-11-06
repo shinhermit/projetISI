@@ -31,7 +31,7 @@ class EarClipping : public IPolygonTriangulator
 {
 private:
     const my::IPolygon * _poly;
-    my::Orientation _orientation;
+    my::Vector _orientation;
     std::vector<my::Triangle> * _triangulation;
     std::vector<int> _currentPoly;
     std::list<int> _convexVertices;

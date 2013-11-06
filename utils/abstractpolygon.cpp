@@ -67,32 +67,44 @@ my::PlanarExpression my::AbstractPolygon::basePlaneExpression()const
     return my::PlanarExpression(vertex(0), edgeVector(0), edgeVector(1));
 }
 
-float my::AbstractPolygon::signedArea()const
+my::Vector my::AbstractPolygon::orientationVector() const
 {
-    _prePolygon("signedArea");
+    _prePolygon("orientationVector");
 
-    my::Vector N, crossSum;
-
-    N = glm::cross(edgeVector(0), edgeVector(1));
+    my::Vector crossSum;
 
     crossSum = my::Vector(0,0,0);
     for(int i=0; i < size(); ++i){
         crossSum += glm::cross( vertex(i), vertex((i+1)%size()) ); //point are vector too (P is vec(OP) where O is the origin
     }
 
-    return glm::dot(N, crossSum) / 2;
+    return crossSum;
+}
+
+float my::AbstractPolygon::signedArea(const my::Vector & sightingVector)const
+{
+    _prePolygon("signedArea");
+
+    my::Vector N;
+
+    N = glm::normalize( glm::cross(edgeVector(0), edgeVector(1)) );
+
+    if( glm::dot(N, sightingVector) < 0 )
+            N = -N;
+
+    return glm::dot(N, orientationVector()) / 2;
 }
 
 float my::AbstractPolygon::area()const
 {
-    return std::abs(signedArea());
+    return std::abs( signedArea(glm::cross(edgeVector(0), edgeVector(1))) );
 }
 
-my::Orientation my::AbstractPolygon::orientation()const
+my::Orientation my::AbstractPolygon::orientation(const my::Vector & sightingVector)const
 {
     my::Orientation wiseness;
 
-    wiseness = (signedArea() < 0) ? my::CLOCKWISE : my::COUNTER_CLOCKWISE;
+    wiseness = ( glm::dot(orientationVector(), sightingVector) < 0 ) ? my::CLOCKWISE : my::COUNTER_CLOCKWISE;
 
     return wiseness;
 }
