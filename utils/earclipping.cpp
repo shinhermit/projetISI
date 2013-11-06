@@ -73,9 +73,6 @@ bool my::EarClipping::_earVertex(const int & vertexRef)const
         ++i;
     }
 
-    if(contains)
-        std::cout << "EarClipping::_earVertex: convex vertex " << vertexRef << " triangle contains vertex " << _currentPoly[i-1] << std::endl;
-
     return !contains;
 }
 
@@ -139,7 +136,13 @@ void my::EarClipping::_checkConvexityChanges(const int & vertex)
         if(it != _earVertices.end()){
             if(!_earVertex(vertex)){
                 _earVertices.erase(it);
-                _convexVertices.push_back(vertex);
+
+                if(_convexVertex(vertex)){
+                    _convexVertices.push_back(vertex);
+                }
+                else{
+                    _reflexVertices.push_back(vertex);
+                }
             }
         }
     }
@@ -189,6 +192,8 @@ void my::EarClipping::_updateLists(const int & earVertex)
     next = _cyclicNext(earVertex);
 
     _currentPoly.erase(_currentPoly.begin()+earVertex);
+
+    _earVertices.pop_front();
 
     _renumberLists(earVertex);
     if(prev > earVertex) --prev;
@@ -248,8 +253,39 @@ void my::EarClipping::process(const my::IPolygon & poly, std::vector<my::Triangl
         _addTriangle(earVertex);
 
         _updateLists(earVertex);
-
-        _earVertices.pop_front();
     }
 }
 
+void my::EarClipping::print_lists(){
+    std::cout << "Current poly vertices vector is [";
+    for(std::vector<int>::iterator it = _currentPoly.begin();
+        it != _currentPoly.end();
+        ++ it){
+        std::cout << *it << " ";
+    }
+    std::cout << "]" << std::endl;
+
+    std::cout << "Convex vertices list is [";
+    for(std::list<int>::iterator it = _convexVertices.begin();
+        it != _convexVertices.end();
+        ++ it){
+        std::cout << *it << " ";
+    }
+    std::cout << "]" << std::endl;
+
+    std::cout << "Reflex vertices list is [";
+    for(std::list<int>::iterator it = _reflexVertices.begin();
+        it != _reflexVertices.end();
+        ++ it){
+        std::cout << *it << " ";
+    }
+    std::cout << "]" << std::endl;
+
+    std::cout << "Ear vertices queue is [";
+    for(std::deque<int>::iterator it = _earVertices.begin();
+        it != _earVertices.end();
+        ++ it){
+        std::cout << *it << " ";
+    }
+    std::cout << "]" << std::endl;
+}

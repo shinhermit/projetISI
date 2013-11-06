@@ -1,25 +1,24 @@
 #include "geometry.h"
 
-float my::Geometry::angle(const my::Vector & u, const my::Vector & v)
+float my::Geometry::angle(const my::Vector & u, const my::Vector & v, const my::Vector & orientingVector)
 {
-    my::Vector u0, v0;
+    my::Vector u0, v0, w0;
     short sign;
 
     u0 = glm::normalize(u);
     v0 = glm::normalize(v);
+    w0 = glm::normalize(orientingVector);
 
-    my::PlanarExpression equation(my::Point(0,0,0), u0, glm::normalize(glm::cross(u0,v0)));
-
-    sign = ( equation(v0[0],v0[1],v0[2]) >= 0 ) ? -1 : 1;
+    sign = ( glm::dot(glm::cross(u0,v0), w0) < 0 ) ? -1 : 1;
 
     return sign * glm::angle(u0,v0);
 }
 
-float my::Geometry::angle360(const my::Vector & u, const my::Vector & v)
+float my::Geometry::angle360(const my::Vector & u, const my::Vector & v, const my::Vector & orientingVector)
 {
     float angle;
 
-    angle = my::Geometry::angle(u,v);
+    angle = my::Geometry::angle(u,v, orientingVector);
 
     if(angle < 0)
         angle += 360;

@@ -106,7 +106,7 @@ public:
 
     /**
       *Provides the orientation of the polygon, as my::CLOCKWISE or my::COUNTER_CLOCKWISE, in relation to a sighting vector.
-      *@param sightingVector the sighting vector
+      *@param sightingVector the sighting vector. Note that sighting vector goes from the object to the observer (points to the sighting position).
       *@return the orientation of the polygon
      */
     virtual my::Orientation orientation(const my::Vector & sightingVector)const=0;
@@ -114,7 +114,7 @@ public:
     /**
       *Provides the signed area of the polygon, in relation to the sighting vector.
       * This allows to know the orientation of the polygon. The area of the polygon is given by the absolute value of the signed area.
-      *@param sightingVector the sighting vector
+      *@param sightingVector the sighting vector.  Note that sighting vector goes from the object to the observer (points to the sighting position).
       *@return Value of the signed area of the polygon
       */
     virtual float signedArea(const my::Vector & sightingVector)const=0;

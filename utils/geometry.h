@@ -30,17 +30,19 @@ public:
       * This function provides oriented angles by space partition. The partition is done by a plane.
       * @param u the first vector that formes the angle
       * @param v the second vector that formes the angle
+      * @param orientingVector a vector that does not belong to the plane defined by u and v, and which typically points to the sighting position.
       * @return oriented (signed) angle between u and v, in range [-180,180]
       */
-    static float angle(const my::Vector & u, const my::Vector & v);
+    static float angle(const my::Vector & u, const my::Vector & v, const my::Vector & orientingVector);
 
     /**
       * Based on my::Geometry::angle, this function provides angle in range [0,360]
       * @param u the first vector that formes the angle
       * @param v the second vector that formes the angle
+      * @param orientingVector a vector that does not belong to the plane defined by u and v, and which typically points to the sighting position.
       * @return oriented (signed) angle between u and v, in range [0,360]
       */
-    static float angle360(const my::Vector & u, const my::Vector & v);
+    static float angle360(const my::Vector & u, const my::Vector & v, const my::Vector & orientingVector);
 
     /**
       * Converts an angle from degree to radian

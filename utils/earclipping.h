@@ -134,6 +134,8 @@ public:
       *@see my::IPolygonTriangulator::process
       */
     void process(const my::IPolygon & poly, std::vector<my::Triangle> & triangulation);
+
+    void print_lists();
 };
 
 }
