@@ -23,7 +23,7 @@ set(SOURCES ${UIC_OUT} ${MOC_OUT}
             objects/triMesh.cpp objects/parametricmesh.cpp objects/cube.cpp objects/pyramid.cpp objects/cubecorner.cpp
             objects/disk.cpp objects/diskhole.cpp objects/cylinder.cpp objects/cone.cpp objects/sphere.cpp
             objects/torus.cpp objects/conicmesh.cpp objects/cylindricmesh.cpp objects/octahedron.cpp objects/isosphere.cpp
-            objects/funcsurface.cpp
+            objects/func_surface.cpp
             parametrics/parametric.cpp parametrics/cylindric.cpp parametrics/spheric.cpp
             parametrics/toric.cpp parametrics/conic.cpp parametrics/circular.cpp parametrics/planar.cpp
             functionals/functional.cpp functionals/func_expcos.cpp functionals/func_sincos.cpp

@@ -10,7 +10,7 @@
 #include "objects/diskhole.h"
 #include "objects/sphere.h"
 #include "objects/torus.h"
-#include "objects/funcsurface.h"
+#include "objects/func_surface.h"
 #include "objects/octahedron.h"
 #include "objects/isosphere.h"
 
