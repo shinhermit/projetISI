@@ -27,6 +27,7 @@ set(SOURCES ${UIC_OUT} ${MOC_OUT}
             parametrics/parametric.cpp parametrics/cylindric.cpp parametrics/spheric.cpp
             parametrics/toric.cpp parametrics/conic.cpp parametrics/circular.cpp parametrics/planar.cpp
             functionals/functional.cpp functionals/func_expcos.cpp functionals/func_sincos.cpp
+            functionals/func_parabolic.cpp
             utils/constant.cpp utils/off_loader.cpp utils/planarexpression utils/geometry
             utils/abstractpolygon.cpp utils/meshrefpolygon.cpp utils/earclipping.cpp utils/isicommandline.cpp)
 

@@ -73,8 +73,9 @@ int main(int argc, char *argv[]){
     // add surface functions
     if(!noFunctional){
         try{
-            myScene->addObject(new my::FuncSurface(50,50, -3.14, 3.14, -3.14, 3.14, my::FuncSinCos()));
             myScene->addObject(new my::FuncSurface(50,50, -3.14, 3.14, -3.14, 3.14));
+            myScene->addObject(new my::FuncSurface(50,50, -3.14, 3.14, -3.14, 3.14, my::FuncSinCos()));
+            myScene->addObject(new my::FuncSurface(50,50, -2, 2, -2, 2, my::FuncParabolic()));
         }
         catch(const std::invalid_argument & e){
             QPointer<QMessageBox> msgbox = new QMessageBox(QMessageBox::Critical, "Exception caught", e.what(), QMessageBox::Ok);
