@@ -10,6 +10,7 @@
 #ifndef FUNCTIONAL_H
 #define FUNCTIONAL_H
 
+#include <string>
 #include <stdexcept>
 #include <glm/gtx/constants.hpp>
 
@@ -21,8 +22,9 @@ namespace my{
  */
 class Functional
 {
+    std::string _name;
 public:
-    Functional();
+    Functional(const std::string & funcName="Functional");
     virtual ~Functional();
 
     /**
@@ -31,6 +33,12 @@ public:
      * The throw clause ensures the function's domain
      */
     virtual float operator()(const float&, const float&)const throw(std::invalid_argument) =0;
+
+    /**
+      * Tells the name of the function
+      * @return the name of the functor
+      */
+    virtual std::string name()const;
 };
 
 }

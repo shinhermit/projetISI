@@ -1,6 +1,8 @@
 #include "func_expcos.h"
 
-my::FuncExpCos::FuncExpCos(){}
+my::FuncExpCos::FuncExpCos()
+    :my::Functional("FuncExpCos")
+{}
 
 float my::FuncExpCos::operator()(const float & x, const float & y)const throw(std::invalid_argument)
 {

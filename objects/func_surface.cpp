@@ -97,6 +97,8 @@ my::FuncSurface::FuncSurface(int nbx, int nby,
     _buildMesh(f);
     _fitMesh();
 
+    setName(getName()+ " " + f.name());
+
     computeNormalsT();
     computeNormalsV();
 }

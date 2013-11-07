@@ -27,7 +27,7 @@ bool my::EarClipping::_convexVertex(const int & vertex)const
     B = _poly->vertex(iB);
     C = _poly->vertex(iC);
 
-    tv = glm::cross(B,C) + glm::cross(C,A) + glm::cross(A,B);
+    tv = glm::cross((B-A),(C-B));
 
     return ( glm::dot(_orientation, tv) > 0 );
 }

@@ -74,8 +74,8 @@ my::Vector my::AbstractPolygon::orientationVector() const
     my::Vector crossSum;
 
     crossSum = my::Vector(0,0,0);
-    for(int i=0; i < size(); ++i){
-        crossSum += glm::cross( vertex(i), vertex((i+1)%size()) ); //point are vector too (P is vec(OP) where O is the origin
+    for(int i=0; i < size()-1; ++i){
+        crossSum += glm::cross( edgeVector(i), edgeVector(i+1) );
     }
 
     return crossSum;
@@ -85,14 +85,19 @@ float my::AbstractPolygon::signedArea(const my::Vector & sightingVector)const
 {
     _prePolygon("signedArea");
 
-    my::Vector N;
+    my::Vector N, choeLace;
 
-    N = glm::normalize( glm::cross(edgeVector(0), edgeVector(1)) );
+    N = glm::normalize(orientationVector());
 
-    if( glm::dot(N, sightingVector) < 0 )
-            N = -N;
+    if(glm::dot(N, sightingVector) < 0)
+        N = -N;
 
-    return glm::dot(N, orientationVector()) / 2;
+    choeLace = my::Vector(0,0,0);
+    for(int i=0; i < size(); ++i){
+        choeLace += glm::cross( vertex(i), vertex((i+1)%size()) ); //point are vector too (P is vec(OP) where O is the origin
+    }
+
+    return glm::dot(N, choeLace) / 2;
 }
 
 float my::AbstractPolygon::area()const

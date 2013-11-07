@@ -26,7 +26,7 @@ public:
     /**
      * An implementation of my::Functional::operator()
      */
-    float operator()(const float& x, const float& y)const throw(std::invalid_argument);
+    float operator()(const float & x, const float & y)const throw(std::invalid_argument);
 };
 
 }
